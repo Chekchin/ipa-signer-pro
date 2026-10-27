@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory, Response, make_response, redirect
+from flask import Flask, render_template, request, jsonify, send_from_directory, Response
 import os
 import time
 import threading
@@ -9,7 +9,6 @@ import zipfile
 import plistlib
 import glob
 import shutil
-import urllib.parse
 
 app = Flask(__name__)
 
@@ -273,63 +272,6 @@ def sign_ipa():
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
-
-# --- មុខងារ UDID Finder ---
-@app.route('/udid')
-def udid_page():
-    return render_template('udid.html')
-
-@app.route('/profile.mobileconfig')
-def download_profile():
-    domain = request.host
-    scheme = "https" if request.is_secure or request.headers.get('X-Forwarded-Proto') == 'https' else "http"
-    server_url = f"{scheme}://{domain}"
-
-    profile_content = f"""<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>PayloadContent</key>
-    <dict>
-        <key>URL</key>
-        <string>{server_url}/udid-receive</string>
-        <key>DeviceAttributes</key>
-        <array>
-            <string>UDID</string>
-            <string>VERSION</string>
-            <string>PRODUCT</string>
-            <string>DEVICE_NAME</string>
-        </array>
-    </dict>
-    <key>PayloadOrganization</key>
-    <string>CHEK STORE UDID Finder</string>
-    <key>PayloadDisplayName</key>
-    <string>CHEK STORE UDID Profile</string>
-    <key>PayloadVersion</key>
-    <integer>1</integer>
-    <key>PayloadUUID</key>
-    <string>A1B2C3D4-E5F6-7890-ABCD-EF0123456789</string>
-    <key>PayloadIdentifier</key>
-    <string>com.chekstore.profile</string>
-    <key>PayloadType</key>
-    <string>Profile Service</string>
-</dict>
-</plist>"""
-    response = make_response(profile_content)
-    response.headers['Content-Type'] = 'application/x-apple-aspen-config'
-    response.headers['Content-Disposition'] = 'attachment; filename="chek_udid.mobileconfig"'
-    return response
-
-@app.route('/udid-receive', methods=['POST'])
-def udid_receive():
-    try:
-        data = request.data
-        plist_data = plistlib.loads(data)
-        udid = plist_data.get('UDID', 'Unknown')
-        device_name = plist_data.get('DEVICE_NAME', 'iPhone/iPad')
-        return redirect(f"/udid?udid={udid}&name={urllib.parse.quote(device_name)}")
-    except Exception as e:
-        return f"Error processing UDID: {str(e)}", 400
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8889))
