@@ -5,12 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CHEK STORE - IPA Signer Online</title>
 
-    <!-- Favicon ឡូហ្គោដើម (cheklogo.png) -->
-    <link
-      rel="icon"
-      type="image/png"
-      href="{{ url_for('static', filename='cheklogo.png') }}"
-    />
+    <!-- 📌 ផ្លាស់ប្តូររូប Icon លើ Tab វេបសាយ (Favicon) ទៅជា Jake logo.png -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='Jake logo.png') }}" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link
@@ -76,52 +72,23 @@
           </div>
         </div>
 
-        <!-- RIGHT HEADER: GET UDID BUTTON & LANGUAGE SWITCHER -->
-        <div class="flex items-center space-x-3">
-          <!-- 📌 ប៊ូតុង Get UDID តូចនៅខាងលើផ្នែកប្តូរភាសា -->
-          <a
-            href="/udid"
-            class="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/30 transition-all flex items-center gap-1.5 shadow-sm"
-          >
-            <i class="fa-solid fa-mobile-screen"></i>
-            <span>Get UDID</span>
-          </a>
-
-          <!-- LANGUAGE SWITCHER -->
-          <div
-            class="flex items-center space-x-1 bg-slate-950 p-1 rounded-xl border border-slate-800"
-          >
-            <button
-              onclick="setLanguage('km')"
-              id="lang-km"
-              class="px-2 py-1 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all"
-            >
-              ខ្មែរ
-            </button>
-            <button
-              onclick="setLanguage('en')"
-              id="lang-en"
-              class="px-2 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all"
-            >
-              EN
-            </button>
-          </div>
+        <!-- LANGUAGE SWITCHER -->
+        <div class="flex items-center space-x-2 bg-slate-950 p-1 rounded-xl border border-slate-800">
+          <button onclick="setLanguage('km')" id="lang-km" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all">ខ្មែរ</button>
+          <button onclick="setLanguage('en')" id="lang-en" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all">EN</button>
         </div>
       </div>
     </header>
 
     <!-- MAIN CONTENT AREA -->
-    <main
-      class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col items-center justify-center"
-    >
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col items-center justify-center">
+
       <!-- DEDICATED CLEAN INSTALL CARD -->
       <div
         id="shared-install-view"
         class="hidden w-full max-w-sm mx-auto bg-slate-900/90 border border-slate-800/80 rounded-3xl p-8 shadow-2xl text-center space-y-6 backdrop-blur-xl my-auto"
       >
-        <div
-          class="w-28 h-28 mx-auto rounded-3xl p-1 bg-gradient-to-tr from-sky-500 via-blue-600 to-indigo-600 shadow-2xl shadow-blue-500/20 flex items-center justify-center overflow-hidden"
-        >
+        <div class="w-28 h-28 mx-auto rounded-3xl p-1 bg-gradient-to-tr from-sky-500 via-blue-600 to-indigo-600 shadow-2xl shadow-blue-500/20 flex items-center justify-center overflow-hidden">
           <img
             src="{{ url_for('static', filename='cheklogo.png') }}"
             alt="App Logo"
@@ -132,10 +99,7 @@
         </div>
 
         <div class="space-y-1">
-          <h2
-            id="shared-app-title"
-            class="text-2xl font-black text-white tracking-wide"
-          >
+          <h2 id="shared-app-title" class="text-2xl font-black text-white tracking-wide">
             App Name
           </h2>
           <p class="text-xs text-slate-400" data-translate="installSub">
@@ -156,147 +120,77 @@
       </div>
 
       <!-- NORMAL UPLOAD & SIGN VIEW -->
-      <div
-        id="normal-app-container"
-        class="w-full space-y-8 flex flex-col items-center"
-      >
+      <div id="normal-app-container" class="w-full space-y-8 flex flex-col items-center">
         <div
           id="main-banner"
           class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden flex flex-col items-center text-center space-y-6 w-full max-w-3xl"
         >
           <div class="relative z-10 flex flex-col items-center space-y-3">
-            <div
-              class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1 bg-gradient-to-tr from-cyan-500 to-teal-400 shadow-xl shadow-cyan-500/20"
-            >
+            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1 bg-gradient-to-tr from-cyan-500 to-teal-400 shadow-xl shadow-cyan-500/20">
               <img
                 src="{{ url_for('static', filename='cheklogo.png') }}"
                 alt="CHEK STORE Logo"
                 class="w-full h-full object-cover rounded-xl bg-slate-950"
               />
             </div>
-            <h2
-              class="text-xl sm:text-2xl font-black tracking-wider bg-gradient-to-r from-cyan-400 via-teal-300 to-sky-400 bg-clip-text text-transparent"
-            >
+            <h2 class="text-xl sm:text-2xl font-black tracking-wider bg-gradient-to-r from-cyan-400 via-teal-300 to-sky-400 bg-clip-text text-transparent">
               IPA SIGNER ONLINE
             </h2>
           </div>
         </div>
 
         <!-- FORM & PROGRESS SECTION -->
-        <div
-          id="form-section"
-          class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full max-w-5xl"
-        >
+        <div id="form-section" class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full max-w-5xl">
           <div id="sign-form-container" class="lg:col-span-7 space-y-6">
             <form
               id="sign-form"
               class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6"
             >
-              <h2
-                class="text-lg font-bold text-slate-200 flex items-center gap-2"
-              >
+              <h2 class="text-lg font-bold text-slate-200 flex items-center gap-2">
                 <i class="fa-solid fa-file-signature text-cyan-400"></i>
-                <span data-translate="formTitle"
-                  >ជ្រើសរើសហ្វាល IPA និង Certificate</span
-                >
+                <span data-translate="formTitle">ជ្រើសរើសហ្វាល IPA និង Certificate</span>
               </h2>
 
               <!-- SELECTOR TAB -->
-              <div
-                class="grid grid-cols-2 gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800"
-              >
-                <button
-                  type="button"
-                  id="tab-upload"
-                  onclick="switchSource('upload')"
-                  class="py-2 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all"
-                >
-                  <i class="fa-solid fa-cloud-arrow-up mr-1"></i>
-                  <span data-translate="tabUpload">Upload IPA ថ្មី</span>
+              <div class="grid grid-cols-2 gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+                <button type="button" id="tab-upload" onclick="switchSource('upload')" class="py-2 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all">
+                  <i class="fa-solid fa-cloud-arrow-up mr-1"></i> <span data-translate="tabUpload">Upload IPA ថ្មី</span>
                 </button>
-                <button
-                  type="button"
-                  id="tab-preset"
-                  onclick="switchSource('preset')"
-                  class="py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all"
-                >
-                  <i class="fa-solid fa-box-archive mr-1"></i>
-                  <span data-translate="tabPreset"
-                    >App ស្រាប់ក្នុងប្រព័ន្ធ</span
-                  >
+                <button type="button" id="tab-preset" onclick="switchSource('preset')" class="py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all">
+                  <i class="fa-solid fa-box-archive mr-1"></i> <span data-translate="tabPreset">App ស្រាប់ក្នុងប្រព័ន្ធ</span>
                 </button>
               </div>
 
               <!-- OPTION A: UPLOAD -->
               <div id="source-upload-container">
-                <label
-                  class="block text-xs font-medium text-slate-400 mb-2"
-                  data-translate="labelIpa"
-                  >១. ហ្វាល IPA (TARGET IPA FILE)</label
-                >
+                <label class="block text-xs font-medium text-slate-400 mb-2" data-translate="labelIpa">១. ហ្វាល IPA (TARGET IPA FILE)</label>
                 <label
                   for="ipa-file-input"
                   id="drop-zone"
                   class="border-2 border-dashed border-slate-700 hover:border-cyan-500/60 bg-slate-950/50 rounded-xl p-6 text-center transition-all cursor-pointer group relative block"
                 >
-                  <input
-                    type="file"
-                    id="ipa-file-input"
-                    name="ipa_file"
-                    accept=".ipa"
-                    class="hidden"
-                  />
+                  <input type="file" id="ipa-file-input" name="ipa_file" accept=".ipa" class="hidden" />
                   <div class="space-y-3" id="drop-zone-idle">
-                    <div
-                      class="w-14 h-14 mx-auto rounded-full bg-slate-800 group-hover:bg-cyan-500/10 flex items-center justify-center text-slate-400 group-hover:text-cyan-400 transition-colors"
-                    >
+                    <div class="w-14 h-14 mx-auto rounded-full bg-slate-800 group-hover:bg-cyan-500/10 flex items-center justify-center text-slate-400 group-hover:text-cyan-400 transition-colors">
                       <i class="fa-brands fa-apple text-3xl"></i>
                     </div>
                     <div>
-                      <p
-                        class="text-sm font-semibold text-slate-200"
-                        data-translate="dropText"
-                      >
-                        ចុចទីនេះដើម្បីជ្រើសរើស ឬទាញទម្លាក់ហ្វាល IPA
-                      </p>
-                      <p
-                        class="text-xs text-slate-500 mt-1"
-                        data-translate="dropSub"
-                      >
-                        គាំទ្រហ្វាល IPA គ្រប់ទំហំ
-                      </p>
+                      <p class="text-sm font-semibold text-slate-200" data-translate="dropText">ចុចទីនេះដើម្បីជ្រើសរើស ឬទាញទម្លាក់ហ្វាល IPA</p>
+                      <p class="text-xs text-slate-500 mt-1" data-translate="dropSub">គាំទ្រហ្វាល IPA គ្រប់ទំហំ</p>
                     </div>
                   </div>
 
-                  <div
-                    id="file-info"
-                    class="hidden flex items-center justify-between bg-slate-800/80 p-4 rounded-lg border border-slate-700"
-                  >
-                    <div
-                      class="flex items-center space-x-3 overflow-hidden text-left"
-                    >
-                      <div
-                        class="w-10 h-10 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0"
-                      >
+                  <div id="file-info" class="hidden flex items-center justify-between bg-slate-800/80 p-4 rounded-lg border border-slate-700">
+                    <div class="flex items-center space-x-3 overflow-hidden text-left">
+                      <div class="w-10 h-10 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
                         <i class="fa-solid mobile-screen text-lg"></i>
                       </div>
                       <div class="truncate">
-                        <p
-                          id="file-name"
-                          class="text-sm font-semibold text-slate-200 truncate"
-                        >
-                          app.ipa
-                        </p>
-                        <p id="file-size" class="text-xs text-slate-400">
-                          0 MB
-                        </p>
+                        <p id="file-name" class="text-sm font-semibold text-slate-200 truncate">app.ipa</p>
+                        <p id="file-size" class="text-xs text-slate-400">0 MB</p>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      id="remove-file-btn"
-                      class="text-slate-400 hover:text-rose-400 p-2 text-sm transition-colors"
-                    >
+                    <button type="button" id="remove-file-btn" class="text-slate-400 hover:text-rose-400 p-2 text-sm transition-colors">
                       <i class="fa-solid fa-xmark"></i>
                     </button>
                   </div>
@@ -305,16 +199,8 @@
 
               <!-- OPTION B: PRESET -->
               <div id="source-preset-container" class="hidden space-y-3">
-                <label
-                  class="block text-xs font-medium text-slate-400 mb-2"
-                  data-translate="labelPreset"
-                  >១. ជ្រើសរើស App ស្រាប់ដែលមានក្នុងប្រព័ន្ធ</label
-                >
-                <select
-                  id="preset-ipa-select"
-                  name="preset_ipa"
-                  class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl px-4 py-3 text-sm text-cyan-300 outline-none transition-colors"
-                >
+                <label class="block text-xs font-medium text-slate-400 mb-2" data-translate="labelPreset">១. ជ្រើសរើស App ស្រាប់ដែលមានក្នុងប្រព័ន្ធ</label>
+                <select id="preset-ipa-select" name="preset_ipa" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl px-4 py-3 text-sm text-cyan-300 outline-none transition-colors">
                   <option value="">-- Loading available apps... --</option>
                 </select>
               </div>
@@ -322,89 +208,31 @@
               <!-- APP CUSTOM NAME & VERSION -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label
-                    class="block text-xs font-medium text-slate-400 mb-2"
-                    data-translate="labelAppName"
-                    >APP NAME (ប្តូរឈ្មោះ App)</label
-                  >
-                  <input
-                    type="text"
-                    id="app-name-input"
-                    name="app_name"
-                    placeholder="ឧ. CHEK STORE"
-                    class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3.5 py-2.5 text-sm text-cyan-300 outline-none transition-colors"
-                  />
+                  <label class="block text-xs font-medium text-slate-400 mb-2" data-translate="labelAppName">APP NAME (ប្តូរឈ្មោះ App)</label>
+                  <input type="text" id="app-name-input" name="app_name" placeholder="ឧ. CHEK STORE" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3.5 py-2.5 text-sm text-cyan-300 outline-none transition-colors" />
                 </div>
                 <div>
-                  <label
-                    class="block text-xs font-medium text-slate-400 mb-2"
-                    data-translate="labelAppVersion"
-                    >APP VERSION (បំពេញ Version)</label
-                  >
-                  <input
-                    type="text"
-                    id="app-version-input"
-                    name="app_version"
-                    placeholder="ឧ. 1.0.0"
-                    class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3.5 py-2.5 text-sm text-cyan-300 outline-none transition-colors font-mono"
-                  />
+                  <label class="block text-xs font-medium text-slate-400 mb-2" data-translate="labelAppVersion">APP VERSION (បំពេញ Version)</label>
+                  <input type="text" id="app-version-input" name="app_version" placeholder="ឧ. 1.0.0" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3.5 py-2.5 text-sm text-cyan-300 outline-none transition-colors font-mono" />
                 </div>
               </div>
 
               <!-- CERTIFICATE (.P12) & PROVISIONING -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label
-                    class="block text-xs font-medium text-slate-400 mb-2"
-                    data-translate="labelP12"
-                    >២. CERTIFICATE (.P12)</label
-                  >
-                  <input
-                    type="file"
-                    id="p12-file-input"
-                    name="p12_file"
-                    accept=".p12"
-                    class="hidden"
-                  />
-                  <button
-                    type="button"
-                    onclick="document.getElementById('p12-file-input').click()"
-                    class="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 text-left px-3.5 py-2.5 rounded-lg text-xs text-slate-300 flex items-center justify-between"
-                  >
-                    <span
-                      id="p12-name"
-                      class="truncate text-cyan-300 font-medium"
-                      data-translate="selectP12"
-                      >ជ្រើសរើសហ្វាល .p12</span
-                    >
+                  <label class="block text-xs font-medium text-slate-400 mb-2" data-translate="labelP12">២. CERTIFICATE (.P12)</label>
+                  <input type="file" id="p12-file-input" name="p12_file" accept=".p12" class="hidden" />
+                  <button type="button" onclick="document.getElementById('p12-file-input').click()" class="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 text-left px-3.5 py-2.5 rounded-lg text-xs text-slate-300 flex items-center justify-between">
+                    <span id="p12-name" class="truncate text-cyan-300 font-medium" data-translate="selectP12">ជ្រើសរើសហ្វាល .p12</span>
                     <i class="fa-solid fa-file-contract text-cyan-400"></i>
                   </button>
                 </div>
 
                 <div>
-                  <label
-                    class="block text-xs font-medium text-slate-400 mb-2"
-                    data-translate="labelProv"
-                    >៣. PROVISIONING PROFILE</label
-                  >
-                  <input
-                    type="file"
-                    id="prov-file-input"
-                    name="mobileprovision_file"
-                    accept=".mobileprovision"
-                    class="hidden"
-                  />
-                  <button
-                    type="button"
-                    onclick="document.getElementById('prov-file-input').click()"
-                    class="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 text-left px-3.5 py-2.5 rounded-lg text-xs text-slate-300 flex items-center justify-between"
-                  >
-                    <span
-                      id="prov-name"
-                      class="truncate text-teal-300 font-medium"
-                      data-translate="selectProv"
-                      >ជ្រើសរើស .mobileprovision</span
-                    >
+                  <label class="block text-xs font-medium text-slate-400 mb-2" data-translate="labelProv">៣. PROVISIONING PROFILE</label>
+                  <input type="file" id="prov-file-input" name="mobileprovision_file" accept=".mobileprovision" class="hidden" />
+                  <button type="button" onclick="document.getElementById('prov-file-input').click()" class="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 text-left px-3.5 py-2.5 rounded-lg text-xs text-slate-300 flex items-center justify-between">
+                    <span id="prov-name" class="truncate text-teal-300 font-medium" data-translate="selectProv">ជ្រើសរើស .mobileprovision</span>
                     <i class="fa-solid fa-id-card text-teal-400"></i>
                   </button>
                 </div>
@@ -412,27 +240,12 @@
 
               <!-- PASSWORD -->
               <div>
-                <label
-                  for="p12-password"
-                  class="block text-xs font-medium text-slate-400 mb-2"
-                  data-translate="labelPass"
-                  >លេខសម្ងាត់ P12 PASSWORD</label
-                >
-                <input
-                  type="password"
-                  id="p12-password"
-                  name="p12_password"
-                  placeholder="បញ្ចូល Password របស់ .p12 (បើមាន)"
-                  class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3.5 py-2.5 text-sm text-cyan-300 outline-none transition-colors font-mono"
-                />
+                <label for="p12-password" class="block text-xs font-medium text-slate-400 mb-2" data-translate="labelPass">លេខសម្ងាត់ P12 PASSWORD</label>
+                <input type="password" id="p12-password" name="p12_password" placeholder="បញ្ចូល Password របស់ .p12 (បើមាន)" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3.5 py-2.5 text-sm text-cyan-300 outline-none transition-colors font-mono" />
               </div>
 
               <!-- SUBMIT -->
-              <button
-                type="submit"
-                id="start-sign-btn"
-                class="w-full bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2 text-base"
-              >
+              <button type="submit" id="start-sign-btn" class="w-full bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2 text-base">
                 <i class="fa-solid fa-bolt"></i>
                 <span data-translate="signBtn">ចាប់ផ្តើម Sign IPA ឥឡូវនេះ</span>
               </button>
@@ -441,86 +254,45 @@
 
           <!-- TELEMETRY -->
           <div id="telemetry-panel" class="lg:col-span-5 space-y-6 w-full">
-            <div
-              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6"
-            >
-              <h2
-                class="text-lg font-bold text-slate-200 flex items-center gap-2"
-              >
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+              <h2 class="text-lg font-bold text-slate-200 flex items-center gap-2">
                 <i class="fa-solid fa-chart-line text-cyan-400"></i>
                 <span data-translate="statusTitle">ស្ថានភាពនៃការ Sign</span>
               </h2>
 
-              <div
-                class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-4"
-              >
+              <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-4">
                 <div class="flex justify-between items-center text-sm">
-                  <span
-                    id="status-label"
-                    class="text-slate-400 font-medium"
-                    data-translate="statusWait"
-                    >ស្ថានភាព៖ រង់ចាំ</span
-                  >
-                  <span
-                    id="progress-percent"
-                    class="font-mono text-cyan-400 font-bold"
-                    >0.00%</span
-                  >
+                  <span id="status-label" class="text-slate-400 font-medium" data-translate="statusWait">ស្ថានភាព៖ រង់ចាំ</span>
+                  <span id="progress-percent" class="font-mono text-cyan-400 font-bold">0.00%</span>
                 </div>
 
                 <div id="progress-container">
-                  <div
-                    class="w-full bg-slate-800 h-3 rounded-full overflow-hidden p-0.5"
-                  >
-                    <div
-                      id="progress-bar-fill"
-                      class="bg-gradient-to-r from-cyan-500 to-teal-400 h-full rounded-full w-0 transition-all duration-300"
-                    ></div>
+                  <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden p-0.5">
+                    <div id="progress-bar-fill" class="bg-gradient-to-r from-cyan-500 to-teal-400 h-full rounded-full w-0 transition-all duration-300"></div>
                   </div>
                 </div>
 
                 <!-- SUCCESS BOX -->
-                <div
-                  id="success-message-box"
-                  class="hidden py-4 px-3 text-center bg-emerald-500/10 border border-emerald-500/30 rounded-xl space-y-3"
-                >
-                  <span
-                    class="text-emerald-400 font-black text-base sm:text-lg tracking-wider flex items-center justify-center gap-2"
-                  >
+                <div id="success-message-box" class="hidden py-4 px-3 text-center bg-emerald-500/10 border border-emerald-500/30 rounded-xl space-y-3">
+                  <span class="text-emerald-400 font-black text-base sm:text-lg tracking-wider flex items-center justify-center gap-2">
                     <i class="fa-solid fa-circle-check text-xl"></i>
                     <span data-translate="successText">Sign ជោគជ័យ!</span>
                   </span>
 
-                  <div
-                    class="flex flex-wrap items-center justify-center gap-2 pt-1"
-                  >
-                    <a
-                      id="install-app-btn"
-                      href="#"
-                      class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition-colors shadow-lg shadow-cyan-500/20"
-                    >
+                  <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
+                    <a id="install-app-btn" href="#" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition-colors shadow-lg shadow-cyan-500/20">
                       <i class="fa-solid fa-download"></i>
                       <span data-translate="installBtn">Install App</span>
                     </a>
 
-                    <a
-                      id="download-signed-ipa"
-                      href="#"
-                      class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-colors shadow-lg shadow-emerald-500/20"
-                    >
+                    <a id="download-signed-ipa" href="#" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-colors shadow-lg shadow-emerald-500/20">
                       <i class="fa-solid fa-file-arrow-down"></i>
                       <span data-translate="downloadBtn">Download</span>
                     </a>
 
-                    <button
-                      type="button"
-                      onclick="copySignedLink()"
-                      class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors border border-slate-700"
-                    >
+                    <button type="button" onclick="copySignedLink()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors border border-slate-700">
                       <i class="fa-solid fa-copy text-cyan-400"></i>
-                      <span id="copy-btn-text" data-translate="copyBtn"
-                        >Copy Link</span
-                      >
+                      <span id="copy-btn-text" data-translate="copyBtn">Copy Link</span>
                     </button>
                   </div>
                 </div>
@@ -531,12 +303,10 @@
       </div>
     </main>
 
-    <!-- FOOTER -->
-    <footer
-      id="main-footer-section"
-      class="border-t border-slate-800 bg-slate-900 py-6 text-center text-xs text-slate-500 space-y-3"
-    >
+    <!-- FOOTER: បង្ហាញតែនៅលើទំព័រដើម (Admin Page) ប៉ុណ្ណោះ -->
+    <footer id="main-footer-section" class="border-t border-slate-800 bg-slate-900 py-6 text-center text-xs text-slate-500 space-y-3">
       <div class="flex items-center justify-center gap-3 flex-wrap px-4">
+        <!-- 📌 កន្លែងដាក់ Link Channel Telegram -->
         <a
           href="https://t.me/channelchinchek12"
           target="_blank"
@@ -546,6 +316,7 @@
           <span>Join Telegram Channel</span>
         </a>
 
+        <!-- 📌 កន្លែងដាក់ Username / Link Support Admin -->
         <a
           href="https://t.me/chinchek55"
           target="_blank"
@@ -568,7 +339,7 @@
           tabUpload: "Upload IPA ថ្មី",
           tabPreset: "App ស្រាប់ក្នុងប្រព័ន្ធ",
           labelIpa: "១. ហ្វាល IPA (TARGET IPA FILE)",
-          dropText: "ចុចទីនេះเพื่อជ្រើសរើស ឬទាញទម្លាក់ហ្វាល IPA",
+          dropText: "ចុចទីនេះដើម្បីជ្រើសរើស ឬទាញទម្លាក់ហ្វាល IPA",
           dropSub: "គាំទ្រហ្វាល IPA គ្រប់ទំហំ",
           labelPreset: "១. ជ្រើសរើស App ស្រាប់ដែលមានក្នុងប្រព័ន្ធ",
           labelAppName: "APP NAME (ប្តូរឈ្មោះ App)",
@@ -583,7 +354,7 @@
           statusWait: "ស្ថានភាព៖ រង់ចាំ",
           successText: "Sign ជោគជ័យ!",
           downloadBtn: "Download",
-          copyBtn: "Copy Link",
+          copyBtn: "Copy Link"
         },
         en: {
           installSub: "application on your iPhone or iPad.",
@@ -607,21 +378,15 @@
           statusWait: "Status: Waiting",
           successText: "Successfully Signed!",
           downloadBtn: "Download",
-          copyBtn: "Copy Link",
-        },
+          copyBtn: "Copy Link"
+        }
       };
 
       function setLanguage(lang) {
-        document.getElementById("lang-km").className =
-          lang === "km"
-            ? "px-2 py-1 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all"
-            : "px-2 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all";
-        document.getElementById("lang-en").className =
-          lang === "en"
-            ? "px-2.5 py-1 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all"
-            : "px-2.5 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all";
-
-        document.querySelectorAll("[data-translate]").forEach((el) => {
+        document.getElementById('lang-km').className = lang === 'km' ? "px-2.5 py-1 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all" : "px-2.5 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all";
+        document.getElementById('lang-en').className = lang === 'en' ? "px-2.5 py-1 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all" : "px-2.5 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all";
+        
+        document.querySelectorAll("[data-translate]").forEach(el => {
           const key = el.getAttribute("data-translate");
           if (translations[lang][key]) {
             el.textContent = translations[lang][key];
@@ -629,54 +394,50 @@
         });
       }
 
-      let currentSource = "upload";
+      let currentSource = 'upload';
 
       function switchSource(type) {
         currentSource = type;
-        const btnUpload = document.getElementById("tab-upload");
-        const btnPreset = document.getElementById("tab-preset");
-        const boxUpload = document.getElementById("source-upload-container");
-        const boxPreset = document.getElementById("source-preset-container");
+        const btnUpload = document.getElementById('tab-upload');
+        const btnPreset = document.getElementById('tab-preset');
+        const boxUpload = document.getElementById('source-upload-container');
+        const boxPreset = document.getElementById('source-preset-container');
 
-        if (type === "upload") {
-          btnUpload.className =
-            "py-2 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all";
-          btnPreset.className =
-            "py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all";
-          boxUpload.classList.remove("hidden");
-          boxPreset.classList.add("hidden");
+        if (type === 'upload') {
+          btnUpload.className = "py-2 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all";
+          btnPreset.className = "py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all";
+          boxUpload.classList.remove('hidden');
+          boxPreset.classList.add('hidden');
         } else {
-          btnPreset.className =
-            "py-2 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all";
-          btnUpload.className =
-            "py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all";
-          boxPreset.classList.remove("hidden");
-          boxUpload.classList.add("hidden");
+          btnPreset.className = "py-2 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all";
+          btnUpload.className = "py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all";
+          boxPreset.classList.remove('hidden');
+          boxUpload.classList.add('hidden');
           loadPresetIpas();
         }
       }
 
       function loadPresetIpas() {
-        fetch("/preset-ipas")
-          .then((res) => res.json())
-          .then((data) => {
-            const selectEl = document.getElementById("preset-ipa-select");
-            selectEl.innerHTML = "";
-            if (data.status === "success" && data.ipas.length > 0) {
-              data.ipas.forEach((filename) => {
-                const opt = document.createElement("option");
+        fetch('/preset-ipas')
+          .then(res => res.json())
+          .then(data => {
+            const selectEl = document.getElementById('preset-ipa-select');
+            selectEl.innerHTML = '';
+            if (data.status === 'success' && data.ipas.length > 0) {
+              data.ipas.forEach(filename => {
+                const opt = document.createElement('option');
                 opt.value = filename;
                 opt.textContent = filename;
                 selectEl.appendChild(opt);
               });
             } else {
-              const opt = document.createElement("option");
-              opt.value = "";
-              opt.textContent = "-- No available apps in preloaded folder --";
+              const opt = document.createElement('option');
+              opt.value = '';
+              opt.textContent = '-- No available apps in preloaded folder --';
               selectEl.appendChild(opt);
             }
           })
-          .catch((err) => console.error("Error loading presets:", err));
+          .catch(err => console.error("Error loading presets:", err));
       }
 
       let lastGeneratedJobId = "";
@@ -687,22 +448,15 @@
           return;
         }
         let origin = window.location.origin;
-        if (
-          origin.startsWith("http://") &&
-          !origin.includes("localhost") &&
-          !origin.includes("127.0.0.1")
-        ) {
+        if (origin.startsWith("http://") && !origin.includes("localhost") && !origin.includes("127.0.0.1")) {
           origin = origin.replace("http://", "https://");
         }
-        const shareUrl =
-          origin + "/?job_id=" + encodeURIComponent(lastGeneratedJobId);
+        const shareUrl = origin + "/?job_id=" + encodeURIComponent(lastGeneratedJobId);
         navigator.clipboard.writeText(shareUrl).then(() => {
           const copyText = document.getElementById("copy-btn-text");
           if (copyText) {
             copyText.textContent = "Copied Link!";
-            setTimeout(() => {
-              copyText.textContent = "Copy Link";
-            }, 2000);
+            setTimeout(() => { copyText.textContent = "Copy Link"; }, 2000);
           }
         });
       }
@@ -762,9 +516,7 @@
         const sharedJobId = urlParams.get("job_id");
         if (sharedJobId) {
           lastGeneratedJobId = sharedJobId;
-          const normalContainer = document.getElementById(
-            "normal-app-container",
-          );
+          const normalContainer = document.getElementById("normal-app-container");
           if (normalContainer) normalContainer.style.display = "none";
 
           const footerSection = document.getElementById("main-footer-section");
@@ -774,31 +526,18 @@
           if (sharedView) sharedView.classList.remove("hidden");
 
           let origin = window.location.origin;
-          if (
-            origin.startsWith("http://") &&
-            !origin.includes("localhost") &&
-            !origin.includes("127.0.0.1")
-          ) {
+          if (origin.startsWith("http://") && !origin.includes("localhost") && !origin.includes("127.0.0.1")) {
             origin = origin.replace("http://", "https://");
           }
-          const manifestUrl =
-            origin +
-            "/manifest.plist?job_id=" +
-            encodeURIComponent(sharedJobId);
-          document.getElementById("shared-install-btn").href =
-            "itms-services://?action=download-manifest&url=" +
-            encodeURIComponent(manifestUrl);
+          const manifestUrl = origin + "/manifest.plist?job_id=" + encodeURIComponent(sharedJobId);
+          document.getElementById("shared-install-btn").href = "itms-services://?action=download-manifest&url=" + encodeURIComponent(manifestUrl);
 
           fetch("/job-info?job_id=" + encodeURIComponent(sharedJobId))
-            .then((res) => res.json())
-            .then((data) => {
+            .then(res => res.json())
+            .then(data => {
               if (data.status === "success") {
-                if (data.title)
-                  document.getElementById("shared-app-title").textContent =
-                    data.title;
-                if (data.icon_url)
-                  document.getElementById("shared-app-logo").src =
-                    origin + data.icon_url;
+                if (data.title) document.getElementById("shared-app-title").textContent = data.title;
+                if (data.icon_url) document.getElementById("shared-app-logo").src = origin + data.icon_url;
               }
             });
         }
@@ -813,23 +552,20 @@
       if (signForm) {
         signForm.addEventListener("submit", (e) => {
           e.preventDefault();
-          if (currentSource === "upload" && !ipaInput.files.length) {
+          if (currentSource === 'upload' && !ipaInput.files.length) {
             alert("សូមជ្រើសរើសហ្វាល IPA!");
             return;
           }
-          if (
-            currentSource === "preset" &&
-            !document.getElementById("preset-ipa-select").value
-          ) {
+          if (currentSource === 'preset' && !document.getElementById('preset-ipa-select').value) {
             alert("សូមជ្រើសរើស App ស្រាប់!");
             return;
           }
 
           const formData = new FormData(signForm);
-          if (currentSource === "upload") {
-            formData.delete("preset_ipa");
+          if (currentSource === 'upload') {
+            formData.delete('preset_ipa');
           } else {
-            formData.delete("ipa_file");
+            formData.delete('ipa_file');
           }
 
           statusLabel.textContent = "ស្ថានភាព៖ កំពុង Sign...";
@@ -864,27 +600,15 @@
                       lastGeneratedJobId = prog.job_id || "";
 
                       let origin = window.location.origin;
-                      if (
-                        origin.startsWith("http://") &&
-                        !origin.includes("localhost") &&
-                        !origin.includes("127.0.0.1")
-                      ) {
+                      if (origin.startsWith("http://") && !origin.includes("localhost") && !origin.includes("127.0.0.1")) {
                         origin = origin.replace("http://", "https://");
                       }
 
                       const downloadUrl = origin + "/output/" + prog.filename;
-                      document.getElementById("download-signed-ipa").href =
-                        downloadUrl;
+                      document.getElementById("download-signed-ipa").href = downloadUrl;
 
-                      const manifestUrl =
-                        origin +
-                        "/manifest.plist?job_id=" +
-                        encodeURIComponent(prog.job_id || "") +
-                        "&url=" +
-                        encodeURIComponent(downloadUrl);
-                      document.getElementById("install-app-btn").href =
-                        "itms-services://?action=download-manifest&url=" +
-                        encodeURIComponent(manifestUrl);
+                      const manifestUrl = origin + "/manifest.plist?job_id=" + encodeURIComponent(prog.job_id || "") + "&url=" + encodeURIComponent(downloadUrl);
+                      document.getElementById("install-app-btn").href = "itms-services://?action=download-manifest&url=" + encodeURIComponent(manifestUrl);
                     }
                   });
               }, 800);
