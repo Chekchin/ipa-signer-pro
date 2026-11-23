@@ -3,9 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chek Store - IPA Signer Online</title>
+    <title>CHEK STORE - IPA Signer Online</title>
 
-    <!-- 📌 ប្រើប្រាស់ឡូហ្គោដើមដែលមានស្រាប់ក្នុង static (cheklogo.png) មកធ្វើជា Tab Icon លើកុំព្យូទ័រ -->
     <link
       rel="icon"
       type="image/png"
@@ -28,17 +27,11 @@
         theme: {
           extend: {
             colors: {
-              brand: {
-                50: "#ecfeff",
-                100: "#cffafe",
-                400: "#22d3ee",
-                500: "#06b6d4",
-                600: "#0891b2",
-                900: "#164e63",
-              },
-              darkbg: "#090d16",
-              cardbg: "#131c2e",
-              terminalbg: "#020617",
+              pureblack: "#666666",
+              blackcard: "#1C1816",
+              blackpanel: "#000005",
+              goldtext: "#db5757",
+              goldsoft: "#db5757",
             },
             fontFamily: {
               sans: ["Kantumruy Pro", "Inter", "sans-serif"],
@@ -48,49 +41,63 @@
         },
       };
     </script>
+    <style>
+      .gold-highlight {
+        color: #ffffff;
+        background: linear-gradient(
+          120deg,
+          rgba(255, 255, 255, 0.14) 0%,
+          rgba(0, 0, 0, 0.25) 100%
+        );
+        padding: 0.08em 0.38em;
+        border-radius: 0.35rem;
+      }
+    </style>
   </head>
   <body
-    class="bg-darkbg text-slate-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white"
+    class="bg-pureblack text-neutral-100 font-sans min-h-screen flex flex-col justify-between selection:bg-white/25 selection:text-white"
   >
     <!-- HEADER -->
     <header
       id="main-header"
-      class="border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50"
+      class="border-b border-neutral-800/90 bg-pureblack/95 backdrop-blur-md sticky top-0 z-50"
     >
       <div
         class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between"
       >
         <div class="flex items-center space-x-3">
           <div
-            class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-cyan-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-cyan-500/30"
+            class="w-10 h-10 rounded-xl bg-gradient-to-tr from-white to-neutral-300 flex items-center justify-center text-black font-black text-xl shadow-md"
           >
             CS
           </div>
           <div>
-            <h1
-              class="text-xl font-extrabold tracking-wider bg-gradient-to-r from-cyan-400 via-teal-300 to-sky-400 bg-clip-text text-transparent"
-            >
-              CHEK STORE
+            <h1 class="text-xl font-extrabold tracking-wider text-white">
+              <span class="gold-highlight">CHEK STORE</span>
             </h1>
-            <p class="text-xs text-slate-400">IPA Signer & Resigning System</p>
+            <p class="text-xs text-neutral-300">
+              IPA Signer & Resigning System
+            </p>
           </div>
         </div>
 
         <!-- LANGUAGE SWITCHER -->
         <div
-          class="flex items-center space-x-2 bg-slate-950 p-1 rounded-xl border border-slate-800"
+          class="flex items-center space-x-2 bg-blackpanel p-1 rounded-xl border border-neutral-800"
         >
           <button
+            type="button"
             onclick="setLanguage('km')"
             id="lang-km"
-            class="px-2.5 py-1 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all"
+            class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-black transition-all"
           >
             ខ្មែរ
           </button>
           <button
+            type="button"
             onclick="setLanguage('en')"
             id="lang-en"
-            class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all"
+            class="px-2.5 py-1 rounded-lg text-xs font-bold text-neutral-300 hover:text-white transition-all"
           >
             EN
           </button>
@@ -100,20 +107,20 @@
 
     <!-- MAIN CONTENT AREA -->
     <main
-      class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col items-center justify-center"
+      class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col items-center justify-center bg-pureblack"
     >
       <!-- DEDICATED CLEAN INSTALL CARD -->
       <div
         id="shared-install-view"
-        class="hidden w-full max-w-sm mx-auto bg-slate-900/90 border border-slate-800/80 rounded-3xl p-8 shadow-2xl text-center space-y-6 backdrop-blur-xl my-auto"
+        class="hidden w-full max-w-sm mx-auto bg-blackcard border border-neutral-800 rounded-3xl p-8 shadow-2xl text-center space-y-6 my-auto"
       >
         <div
-          class="w-28 h-28 mx-auto rounded-3xl p-1 bg-gradient-to-tr from-sky-500 via-blue-600 to-indigo-600 shadow-2xl shadow-blue-500/20 flex items-center justify-center overflow-hidden"
+          class="w-28 h-28 mx-auto rounded-3xl p-1 bg-gradient-to-tr from-white via-neutral-200 to-neutral-400 shadow-lg flex items-center justify-center overflow-hidden"
         >
           <img
             src="{{ url_for('static', filename='cheklogo.png') }}"
             alt="App Logo"
-            class="w-full h-full object-cover rounded-2xl bg-slate-950"
+            class="w-full h-full object-cover rounded-2xl bg-pureblack"
             id="shared-app-logo"
             onerror="this.src='{{ url_for('static', filename='cheklogo.png') }}'"
           />
@@ -126,7 +133,7 @@
           >
             App Name
           </h2>
-          <p class="text-xs text-slate-400" data-translate="installSub">
+          <p class="text-xs text-neutral-300" data-translate="installSub">
             application on your iPhone or iPad.
           </p>
         </div>
@@ -135,7 +142,7 @@
           <a
             id="shared-install-btn"
             href="#"
-            class="w-full bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-bold py-3.5 px-6 rounded-2xl shadow-xl shadow-sky-600/30 transition-all flex items-center justify-center gap-2 text-base"
+            class="w-full bg-white hover:bg-neutral-200 active:scale-95 text-black font-bold py-3.5 px-6 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-base"
           >
             <i class="fa-solid fa-download"></i>
             <span data-translate="installBtn">Install App</span>
@@ -150,22 +157,22 @@
       >
         <div
           id="main-banner"
-          class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden flex flex-col items-center text-center space-y-6 w-full max-w-3xl"
+          class="bg-blackcard border border-neutral-800 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden flex flex-col items-center text-center space-y-6 w-full max-w-3xl"
         >
           <div class="relative z-10 flex flex-col items-center space-y-3">
             <div
-              class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1 bg-gradient-to-tr from-cyan-500 to-teal-400 shadow-xl shadow-cyan-500/20"
+              class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1 bg-gradient-to-tr from-white to-neutral-300 shadow-lg"
             >
               <img
                 src="{{ url_for('static', filename='cheklogo.png') }}"
                 alt="CHEK STORE Logo"
-                class="w-full h-full object-cover rounded-xl bg-slate-950"
+                class="w-full h-full object-cover rounded-xl bg-pureblack"
               />
             </div>
             <h2
-              class="text-xl sm:text-2xl font-black tracking-wider bg-gradient-to-r from-cyan-400 via-teal-300 to-sky-400 bg-clip-text text-transparent"
+              class="text-xl sm:text-2xl font-black tracking-wider text-white"
             >
-              IPA SIGNER ONLINE
+              <span class="gold-highlight">IPA SIGNER ONLINE</span>
             </h2>
           </div>
         </div>
@@ -178,26 +185,26 @@
           <div id="sign-form-container" class="lg:col-span-7 space-y-6">
             <form
               id="sign-form"
-              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6"
+              class="bg-blackcard border border-neutral-800 rounded-2xl p-6 shadow-xl space-y-5"
             >
               <h2
-                class="text-lg font-bold text-slate-200 flex items-center gap-2"
+                class="text-lg font-bold text-white flex items-center gap-2"
               >
-                <i class="fa-solid fa-file-signature text-cyan-400"></i>
-                <span data-translate="formTitle"
+                <i class="fa-solid fa-file-signature text-white"></i>
+                <span data-translate="formTitle" class="gold-highlight"
                   >ជ្រើសរើសហ្វាល IPA និង Certificate</span
                 >
               </h2>
 
               <!-- SELECTOR TAB -->
               <div
-                class="grid grid-cols-2 gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800"
+                class="grid grid-cols-2 gap-2 bg-pureblack p-1.5 rounded-xl border border-neutral-800"
               >
                 <button
                   type="button"
                   id="tab-upload"
                   onclick="switchSource('upload')"
-                  class="py-2 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all"
+                  class="py-2 rounded-lg text-xs font-bold bg-white text-black transition-all"
                 >
                   <i class="fa-solid fa-cloud-arrow-up mr-1"></i>
                   <span data-translate="tabUpload">Upload IPA ថ្មី</span>
@@ -206,7 +213,7 @@
                   type="button"
                   id="tab-preset"
                   onclick="switchSource('preset')"
-                  class="py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all"
+                  class="py-2 rounded-lg text-xs font-bold text-neutral-300 hover:text-white transition-all"
                 >
                   <i class="fa-solid fa-box-archive mr-1"></i>
                   <span data-translate="tabPreset"
@@ -218,14 +225,14 @@
               <!-- OPTION A: UPLOAD -->
               <div id="source-upload-container">
                 <label
-                  class="block text-xs font-medium text-slate-400 mb-2"
+                  class="block text-xs font-semibold text-white mb-2"
                   data-translate="labelIpa"
                   >១. ហ្វាល IPA (TARGET IPA FILE)</label
                 >
                 <label
                   for="ipa-file-input"
                   id="drop-zone"
-                  class="border-2 border-dashed border-slate-700 hover:border-cyan-500/60 bg-slate-950/50 rounded-xl p-6 text-center transition-all cursor-pointer group relative block"
+                  class="border-2 border-dashed border-neutral-700 hover:border-white bg-pureblack rounded-xl p-6 text-center transition-all cursor-pointer group relative block"
                 >
                   <input
                     type="file"
@@ -236,19 +243,19 @@
                   />
                   <div class="space-y-3" id="drop-zone-idle">
                     <div
-                      class="w-14 h-14 mx-auto rounded-full bg-slate-800 group-hover:bg-cyan-500/10 flex items-center justify-center text-slate-400 group-hover:text-cyan-400 transition-colors"
+                      class="w-14 h-14 mx-auto rounded-full bg-neutral-900 group-hover:bg-white/15 flex items-center justify-center text-white transition-colors"
                     >
                       <i class="fa-brands fa-apple text-3xl"></i>
                     </div>
                     <div>
                       <p
-                        class="text-sm font-semibold text-slate-200"
+                        class="text-sm font-semibold text-white"
                         data-translate="dropText"
                       >
                         ចុចទីនេះដើម្បីជ្រើសរើស ឬទាញទម្លាក់ហ្វាល IPA
                       </p>
                       <p
-                        class="text-xs text-slate-500 mt-1"
+                        class="text-xs text-neutral-400 mt-1"
                         data-translate="dropSub"
                       >
                         គាំទ្រហ្វាល IPA គ្រប់ទំហំ
@@ -258,24 +265,24 @@
 
                   <div
                     id="file-info"
-                    class="hidden flex items-center justify-between bg-slate-800/80 p-4 rounded-lg border border-slate-700"
+                    class="hidden flex items-center justify-between bg-blackpanel p-4 rounded-lg border border-neutral-800"
                   >
                     <div
                       class="flex items-center space-x-3 overflow-hidden text-left"
                     >
                       <div
-                        class="w-10 h-10 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0"
+                        class="w-10 h-10 rounded bg-white/10 text-white flex items-center justify-center shrink-0"
                       >
-                        <i class="fa-solid mobile-screen text-lg"></i>
+                        <i class="fa-solid fa-mobile-screen text-lg"></i>
                       </div>
                       <div class="truncate">
                         <p
                           id="file-name"
-                          class="text-sm font-semibold text-slate-200 truncate"
+                          class="text-sm font-semibold text-white truncate"
                         >
                           app.ipa
                         </p>
-                        <p id="file-size" class="text-xs text-slate-400">
+                        <p id="file-size" class="text-xs text-neutral-400">
                           0 MB
                         </p>
                       </div>
@@ -283,7 +290,7 @@
                     <button
                       type="button"
                       id="remove-file-btn"
-                      class="text-slate-400 hover:text-rose-400 p-2 text-sm transition-colors"
+                      class="text-neutral-400 hover:text-white p-2 text-sm transition-colors"
                     >
                       <i class="fa-solid fa-xmark"></i>
                     </button>
@@ -294,24 +301,24 @@
               <!-- OPTION B: PRESET -->
               <div id="source-preset-container" class="hidden space-y-3">
                 <label
-                  class="block text-xs font-medium text-slate-400 mb-2"
+                  class="block text-xs font-semibold text-white mb-2"
                   data-translate="labelPreset"
                   >១. ជ្រើសរើស App ស្រាប់ដែលមានក្នុងប្រព័ន្ធ</label
                 >
                 <select
                   id="preset-ipa-select"
                   name="preset_ipa"
-                  class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl px-4 py-3 text-sm text-cyan-300 outline-none transition-colors"
+                  class="w-full bg-pureblack border border-neutral-800 focus:border-white rounded-xl px-4 py-3 text-sm text-white outline-none transition-colors"
                 >
                   <option value="">-- Loading available apps... --</option>
                 </select>
               </div>
 
-              <!-- APP CUSTOM NAME & VERSION -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- APP NAME, BUNDLE ID & VERSION -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label
-                    class="block text-xs font-medium text-slate-400 mb-2"
+                    class="block text-xs font-semibold text-white mb-2"
                     data-translate="labelAppName"
                     >APP NAME (ប្តូរឈ្មោះ App)</label
                   >
@@ -319,22 +326,38 @@
                     type="text"
                     id="app-name-input"
                     name="app_name"
-                    placeholder="ឧ. CHEK STORE"
-                    class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3.5 py-2.5 text-sm text-cyan-300 outline-none transition-colors"
+                    placeholder="ឈ្មោះ App ថ្មី..."
+                    class="w-full bg-pureblack border border-neutral-800 focus:border-white rounded-lg px-3 py-2.5 text-sm text-white placeholder-neutral-400 outline-none transition-colors"
                   />
                 </div>
+
                 <div>
                   <label
-                    class="block text-xs font-medium text-slate-400 mb-2"
+                    class="block text-xs font-semibold text-white mb-2"
+                    data-translate="labelBundleId"
+                    >BUNDLE ID (ប្តូរ ID App)</label
+                  >
+                  <input
+                    type="text"
+                    id="bundle-id-input"
+                    name="bundle_id"
+                    placeholder="com.chek.app"
+                    class="w-full bg-pureblack border border-neutral-800 focus:border-white rounded-lg px-3 py-2.5 text-sm text-white placeholder-neutral-400 outline-none transition-colors font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    class="block text-xs font-semibold text-white mb-2"
                     data-translate="labelAppVersion"
-                    >APP VERSION (បំពេញ Version)</label
+                    >APP VERSION (ប្តូរ Version)</label
                   >
                   <input
                     type="text"
                     id="app-version-input"
                     name="app_version"
-                    placeholder="ឧ. 1.0.0"
-                    class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3.5 py-2.5 text-sm text-cyan-300 outline-none transition-colors font-mono"
+                    placeholder="1.0.0"
+                    class="w-full bg-pureblack border border-neutral-800 focus:border-white rounded-lg px-3 py-2.5 text-sm text-white placeholder-neutral-400 outline-none transition-colors font-mono"
                   />
                 </div>
               </div>
@@ -343,7 +366,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label
-                    class="block text-xs font-medium text-slate-400 mb-2"
+                    class="block text-xs font-semibold text-white mb-2"
                     data-translate="labelP12"
                     >២. CERTIFICATE (.P12)</label
                   >
@@ -357,21 +380,21 @@
                   <button
                     type="button"
                     onclick="document.getElementById('p12-file-input').click()"
-                    class="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 text-left px-3.5 py-2.5 rounded-lg text-xs text-slate-300 flex items-center justify-between"
+                    class="w-full bg-pureblack border border-neutral-800 hover:border-white text-left px-3.5 py-2.5 rounded-lg text-xs text-neutral-200 flex items-center justify-between"
                   >
                     <span
                       id="p12-name"
-                      class="truncate text-cyan-300 font-medium"
+                      class="truncate text-white font-medium"
                       data-translate="selectP12"
                       >ជ្រើសរើសហ្វាល .p12</span
                     >
-                    <i class="fa-solid fa-file-contract text-cyan-400"></i>
+                    <i class="fa-solid fa-file-contract text-white"></i>
                   </button>
                 </div>
 
                 <div>
                   <label
-                    class="block text-xs font-medium text-slate-400 mb-2"
+                    class="block text-xs font-semibold text-white mb-2"
                     data-translate="labelProv"
                     >៣. PROVISIONING PROFILE</label
                   >
@@ -385,15 +408,15 @@
                   <button
                     type="button"
                     onclick="document.getElementById('prov-file-input').click()"
-                    class="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 text-left px-3.5 py-2.5 rounded-lg text-xs text-slate-300 flex items-center justify-between"
+                    class="w-full bg-pureblack border border-neutral-800 hover:border-white text-left px-3.5 py-2.5 rounded-lg text-xs text-neutral-200 flex items-center justify-between"
                   >
                     <span
                       id="prov-name"
-                      class="truncate text-teal-300 font-medium"
+                      class="truncate text-white font-medium"
                       data-translate="selectProv"
                       >ជ្រើសរើស .mobileprovision</span
                     >
-                    <i class="fa-solid fa-id-card text-teal-400"></i>
+                    <i class="fa-solid fa-id-card text-white"></i>
                   </button>
                 </div>
               </div>
@@ -402,7 +425,7 @@
               <div>
                 <label
                   for="p12-password"
-                  class="block text-xs font-medium text-slate-400 mb-2"
+                  class="block text-xs font-semibold text-white mb-2"
                   data-translate="labelPass"
                   >លេខសម្ងាត់ P12 PASSWORD</label
                 >
@@ -411,15 +434,120 @@
                   id="p12-password"
                   name="p12_password"
                   placeholder="បញ្ចូល Password របស់ .p12 (បើមាន)"
-                  class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3.5 py-2.5 text-sm text-cyan-300 outline-none transition-colors font-mono"
+                  class="w-full bg-pureblack border border-neutral-800 focus:border-white rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-neutral-400 outline-none transition-colors font-mono"
                 />
+              </div>
+
+              <!-- OPTIONAL CUSTOMIZATION (ICON, DYLIB/DEB, PLIST FLAGS) -->
+              <div
+                class="bg-pureblack border border-neutral-800 rounded-xl p-4 space-y-4"
+              >
+                <p
+                  class="text-xs font-bold text-white flex items-center gap-1.5"
+                >
+                  <i class="fa-solid fa-sliders text-white"></i>
+                  <span data-translate="extraTitle" class="gold-highlight"
+                    >ជម្រើសបន្ថែម (ប្តូរ Icon / Inject Dylib & Deb / សិទ្ធិ
+                    Files)</span
+                  >
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label
+                      class="block text-xs font-semibold text-white mb-1.5"
+                      data-translate="labelIcon"
+                      >ប្តូរ ICON APP (.PNG / .JPG)</label
+                    >
+                    <input
+                      type="file"
+                      id="icon-file-input"
+                      name="custom_icon_file"
+                      accept="image/png,image/jpeg"
+                      class="hidden"
+                    />
+                    <button
+                      type="button"
+                      onclick="
+                        document.getElementById('icon-file-input').click()
+                      "
+                      class="w-full bg-blackcard border border-neutral-800 hover:border-white text-left px-3 py-2 rounded-lg text-xs text-neutral-200 flex items-center justify-between"
+                    >
+                      <span
+                        id="icon-name"
+                        class="truncate text-white font-medium"
+                        data-translate="selectIcon"
+                        >ជ្រើសរើសរូបភាព Icon (បើចង់ប្តូរ)</span
+                      >
+                      <i class="fa-solid fa-image text-white"></i>
+                    </button>
+                  </div>
+
+                  <div>
+                    <label
+                      class="block text-xs font-semibold text-white mb-1.5"
+                      data-translate="labelTweak"
+                      >INJECT DYLIB / DEB (បញ្ចូល Tweak)</label
+                    >
+                    <input
+                      type="file"
+                      id="tweak-file-input"
+                      name="tweak_file"
+                      accept=".dylib,.deb"
+                      class="hidden"
+                    />
+                    <button
+                      type="button"
+                      onclick="
+                        document.getElementById('tweak-file-input').click()
+                      "
+                      class="w-full bg-blackcard border border-neutral-800 hover:border-white text-left px-3 py-2 rounded-lg text-xs text-neutral-200 flex items-center justify-between"
+                    >
+                      <span
+                        id="tweak-name"
+                        class="truncate text-white font-medium"
+                        data-translate="selectTweak"
+                        >ជ្រើសរើស .dylib ឬ .deb (បើមាន)</span
+                      >
+                      <i class="fa-solid fa-puzzle-piece text-white"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <label
+                    class="flex items-center gap-2 text-xs font-medium text-neutral-200 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      name="enable_file_sharing"
+                      class="w-4 h-4 accent-white rounded"
+                    />
+                    <span data-translate="optFileSharing"
+                      >បើក File Sharing (មើលក្នុង Files App)</span
+                    >
+                  </label>
+
+                  <label
+                    class="flex items-center gap-2 text-xs font-medium text-neutral-200 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      name="remove_device_limit"
+                      class="w-4 h-4 accent-white rounded"
+                    />
+                    <span data-translate="optDeviceLimit"
+                      >លុបកម្រិតឧបករណ៍ (ដំឡើងបានទាំង iPad)</span
+                    >
+                  </label>
+                </div>
               </div>
 
               <!-- SUBMIT -->
               <button
                 type="submit"
                 id="start-sign-btn"
-                class="w-full bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2 text-base"
+                class="w-full bg-gradient-to-r from-white to-neutral-200 hover:from-neutral-100 hover:to-neutral-300 text-black font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-base"
               >
                 <i class="fa-solid fa-bolt"></i>
                 <span data-translate="signBtn">ចាប់ផ្តើម Sign IPA ឥឡូវនេះ</span>
@@ -430,39 +558,41 @@
           <!-- TELEMETRY -->
           <div id="telemetry-panel" class="lg:col-span-5 space-y-6 w-full">
             <div
-              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6"
+              class="bg-blackcard border border-neutral-800 rounded-2xl p-6 shadow-xl space-y-6"
             >
               <h2
-                class="text-lg font-bold text-slate-200 flex items-center gap-2"
+                class="text-lg font-bold text-white flex items-center gap-2"
               >
-                <i class="fa-solid fa-chart-line text-cyan-400"></i>
-                <span data-translate="statusTitle">ស្ថានភាពនៃការ Sign</span>
+                <i class="fa-solid fa-chart-line text-white"></i>
+                <span data-translate="statusTitle" class="gold-highlight"
+                  >ស្ថានភាពនៃការ Sign</span
+                >
               </h2>
 
               <div
-                class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-4"
+                class="bg-pureblack border border-neutral-800 rounded-xl p-5 space-y-4"
               >
                 <div class="flex justify-between items-center text-sm">
                   <span
                     id="status-label"
-                    class="text-slate-400 font-medium"
+                    class="text-neutral-200 font-medium"
                     data-translate="statusWait"
                     >ស្ថានភាព៖ រង់ចាំ</span
                   >
                   <span
                     id="progress-percent"
-                    class="font-mono text-cyan-400 font-bold"
+                    class="font-mono text-white font-bold"
                     >0.00%</span
                   >
                 </div>
 
                 <div id="progress-container">
                   <div
-                    class="w-full bg-slate-800 h-3 rounded-full overflow-hidden p-0.5"
+                    class="w-full bg-neutral-900 h-3 rounded-full overflow-hidden p-0.5 border border-neutral-800"
                   >
                     <div
                       id="progress-bar-fill"
-                      class="bg-gradient-to-r from-cyan-500 to-teal-400 h-full rounded-full w-0 transition-all duration-300"
+                      class="bg-gradient-to-r from-white to-neutral-300 h-full rounded-full w-0 transition-all duration-300"
                     ></div>
                   </div>
                 </div>
@@ -470,13 +600,17 @@
                 <!-- SUCCESS BOX -->
                 <div
                   id="success-message-box"
-                  class="hidden py-4 px-3 text-center bg-emerald-500/10 border border-emerald-500/30 rounded-xl space-y-3"
+                  class="hidden py-4 px-3 text-center bg-blackpanel border border-neutral-700 rounded-xl space-y-3"
                 >
                   <span
-                    class="text-emerald-400 font-black text-base sm:text-lg tracking-wider flex items-center justify-center gap-2"
+                    class="text-white font-black text-base sm:text-lg tracking-wider flex items-center justify-center gap-2"
                   >
-                    <i class="fa-solid fa-circle-check text-xl"></i>
-                    <span data-translate="successText">Sign ជោគជ័យ!</span>
+                    <i
+                      class="fa-solid fa-circle-check text-xl text-white"
+                    ></i>
+                    <span data-translate="successText" class="gold-highlight"
+                      >Sign ជោគជ័យ!</span
+                    >
                   </span>
 
                   <div
@@ -485,7 +619,7 @@
                     <a
                       id="install-app-btn"
                       href="#"
-                      class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition-colors shadow-lg shadow-cyan-500/20"
+                      class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-neutral-200 text-black font-bold text-xs transition-colors shadow-md"
                     >
                       <i class="fa-solid fa-download"></i>
                       <span data-translate="installBtn">Install App</span>
@@ -494,7 +628,8 @@
                     <a
                       id="download-signed-ipa"
                       href="#"
-                      class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-colors shadow-lg shadow-emerald-500/20"
+                      download
+                      class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-200 hover:bg-white text-black font-bold text-xs transition-colors shadow-md"
                     >
                       <i class="fa-solid fa-file-arrow-down"></i>
                       <span data-translate="downloadBtn">Download</span>
@@ -502,10 +637,11 @@
 
                     <button
                       type="button"
+                      id="copy-link-btn"
                       onclick="copySignedLink()"
-                      class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors border border-slate-700"
+                      class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blackcard hover:bg-neutral-800 text-white font-bold text-xs transition-colors border border-neutral-700"
                     >
-                      <i class="fa-solid fa-copy text-cyan-400"></i>
+                      <i class="fa-solid fa-copy text-white"></i>
                       <span id="copy-btn-text" data-translate="copyBtn"
                         >Copy Link</span
                       >
@@ -519,33 +655,34 @@
       </div>
     </main>
 
-    <!-- FOOTER: បង្ហាញតែនៅលើទំព័រដើម (Admin Page) ប៉ុណ្ណោះ -->
+    <!-- FOOTER -->
     <footer
       id="main-footer-section"
-      class="border-t border-slate-800 bg-slate-900 py-6 text-center text-xs text-slate-500 space-y-3"
+      class="border-t border-neutral-800 bg-pureblack py-6 text-center text-xs text-neutral-300 space-y-3"
     >
       <div class="flex items-center justify-center gap-3 flex-wrap px-4">
-        <!-- 📌 កន្លែងដាក់ Link Channel Telegram -->
         <a
           href="https://t.me/channelchinchek12"
           target="_blank"
-          class="inline-flex items-center gap-2 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 font-semibold px-4 py-2 rounded-xl border border-sky-500/30 transition-all text-xs shadow-md"
+          class="inline-flex items-center gap-2 bg-blackpanel hover:bg-neutral-800 text-white font-semibold px-4 py-2 rounded-xl border border-neutral-700 transition-all text-xs shadow-sm"
         >
-          <i class="fa-brands fa-telegram text-base"></i>
+          <i class="fa-brands fa-telegram text-base text-white"></i>
           <span>Join Telegram Channel</span>
         </a>
 
-        <!-- 📌 កន្លែងដាក់ Username / Link Support Admin -->
         <a
           href="https://t.me/chinchek55"
           target="_blank"
-          class="inline-flex items-center gap-2 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 font-semibold px-4 py-2 rounded-xl border border-cyan-500/30 transition-all text-xs shadow-md"
+          class="inline-flex items-center gap-2 bg-blackpanel hover:bg-neutral-800 text-white font-semibold px-4 py-2 rounded-xl border border-neutral-700 transition-all text-xs shadow-sm"
         >
-          <i class="fa-solid fa-headset text-base"></i>
+          <i class="fa-solid fa-headset text-base text-white"></i>
           <span>Support Admin</span>
         </a>
       </div>
-      <p>© 2026 CHEK STORE - IPA Signer Tool. All rights reserved.</p>
+      <p>
+        © 2026 <span class="gold-highlight">CHEK STORE</span> - IPA Signer Tool.
+        All rights reserved.
+      </p>
     </footer>
 
     <!-- SCRIPT & TRANSLATIONS -->
@@ -562,12 +699,21 @@
           dropSub: "គាំទ្រហ្វាល IPA គ្រប់ទំហំ",
           labelPreset: "១. ជ្រើសរើស App ស្រាប់ដែលមានក្នុងប្រព័ន្ធ",
           labelAppName: "APP NAME (ប្តូរឈ្មោះ App)",
-          labelAppVersion: "APP VERSION (បំពេញ Version)",
+          labelBundleId: "BUNDLE ID (ប្តូរ ID App)",
+          labelAppVersion: "APP VERSION (ប្តូរ Version)",
           labelP12: "២. CERTIFICATE (.P12)",
           selectP12: "ជ្រើសរើសហ្វាល .p12",
           labelProv: "៣. PROVISIONING PROFILE",
           selectProv: "ជ្រើសរើស .mobileprovision",
           labelPass: "លេខសម្ងាត់ P12 PASSWORD",
+          extraTitle:
+            "ជម្រើសបន្ថែម (ប្តូរ Icon / Inject Dylib & Deb / សិទ្ធិ Files)",
+          labelIcon: "ប្តូរ ICON APP (.PNG / .JPG)",
+          selectIcon: "ជ្រើសរើសរូបភាព Icon (បើចង់ប្តូរ)",
+          labelTweak: "INJECT DYLIB / DEB (បញ្ចូល Tweak)",
+          selectTweak: "ជ្រើសរើស .dylib ឬ .deb (បើមាន)",
+          optFileSharing: "បើក File Sharing (មើលក្នុង Files App)",
+          optDeviceLimit: "លុបកម្រិតឧបករណ៍ (ដំឡើងបានទាំង iPad)",
           signBtn: "ចាប់ផ្តើម Sign IPA ឥឡូវនេះ",
           statusTitle: "ស្ថានភាពនៃការ Sign",
           statusWait: "ស្ថានភាព៖ រង់ចាំ",
@@ -586,12 +732,21 @@
           dropSub: "Support all IPA file sizes",
           labelPreset: "1. Select Preloaded App",
           labelAppName: "APP NAME (Custom Name)",
-          labelAppVersion: "APP VERSION",
+          labelBundleId: "BUNDLE ID (Custom ID)",
+          labelAppVersion: "APP VERSION (Custom Version)",
           labelP12: "2. CERTIFICATE (.P12)",
           selectP12: "Select .p12 file",
           labelProv: "3. PROVISIONING PROFILE",
           selectProv: "Select .mobileprovision",
           labelPass: "P12 PASSWORD",
+          extraTitle:
+            "Extra Options (Custom Icon / Inject Dylib & Deb / Plist)",
+          labelIcon: "CUSTOM APP ICON (.PNG / .JPG)",
+          selectIcon: "Select custom icon (optional)",
+          labelTweak: "INJECT DYLIB / DEB (Tweak)",
+          selectTweak: "Select .dylib or .deb (optional)",
+          optFileSharing: "Enable File Sharing (Files App)",
+          optDeviceLimit: "Remove Device Restriction (iPad Support)",
           signBtn: "Start Signing IPA Now",
           statusTitle: "Signing Status",
           statusWait: "Status: Waiting",
@@ -604,12 +759,12 @@
       function setLanguage(lang) {
         document.getElementById("lang-km").className =
           lang === "km"
-            ? "px-2.5 py-1 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all"
-            : "px-2.5 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all";
+            ? "px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-black transition-all"
+            : "px-2.5 py-1 rounded-lg text-xs font-bold text-neutral-300 hover:text-white transition-all";
         document.getElementById("lang-en").className =
           lang === "en"
-            ? "px-2.5 py-1 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all"
-            : "px-2.5 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all";
+            ? "px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-black transition-all"
+            : "px-2.5 py-1 rounded-lg text-xs font-bold text-neutral-300 hover:text-white transition-all";
 
         document.querySelectorAll("[data-translate]").forEach((el) => {
           const key = el.getAttribute("data-translate");
@@ -630,16 +785,16 @@
 
         if (type === "upload") {
           btnUpload.className =
-            "py-2 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all";
+            "py-2 rounded-lg text-xs font-bold bg-white text-black transition-all";
           btnPreset.className =
-            "py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all";
+            "py-2 rounded-lg text-xs font-bold text-neutral-300 hover:text-white transition-all";
           boxUpload.classList.remove("hidden");
           boxPreset.classList.add("hidden");
         } else {
           btnPreset.className =
-            "py-2 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 transition-all";
+            "py-2 rounded-lg text-xs font-bold bg-white text-black transition-all";
           btnUpload.className =
-            "py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all";
+            "py-2 rounded-lg text-xs font-bold text-neutral-300 hover:text-white transition-all";
           boxPreset.classList.remove("hidden");
           boxUpload.classList.add("hidden");
           loadPresetIpas();
@@ -670,31 +825,74 @@
       }
 
       let lastGeneratedJobId = "";
+      let lastGeneratedFilename = "";
+
+      function getCurrentOrigin(forceHttpsForManifest = false) {
+        let origin = window.location.origin;
+        if (forceHttpsForManifest && origin.startsWith("http://")) {
+          origin = origin.replace("http://", "https://");
+        }
+        return origin;
+      }
+
+      function copyTextFallback(text) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "-1000px";
+        ta.style.left = "-1000px";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        let ok = false;
+        try {
+          ok = document.execCommand("copy");
+        } catch (e) {
+          ok = false;
+        }
+        document.body.removeChild(ta);
+        return ok;
+      }
+
+      function markCopiedUi() {
+        const copyText = document.getElementById("copy-btn-text");
+        if (copyText) {
+          copyText.textContent = "Copied Link!";
+          setTimeout(() => {
+            copyText.textContent = "Copy Link";
+          }, 2000);
+        }
+      }
 
       function copySignedLink() {
-        if (!lastGeneratedJobId) {
+        if (!lastGeneratedJobId && !lastGeneratedFilename) {
           alert("សូម Sign IPA ជាមុនសិន!");
           return;
         }
-        let origin = window.location.origin;
-        if (
-          origin.startsWith("http://") &&
-          !origin.includes("localhost") &&
-          !origin.includes("127.0.0.1")
-        ) {
-          origin = origin.replace("http://", "https://");
-        }
-        const shareUrl =
-          origin + "/?job_id=" + encodeURIComponent(lastGeneratedJobId);
-        navigator.clipboard.writeText(shareUrl).then(() => {
-          const copyText = document.getElementById("copy-btn-text");
-          if (copyText) {
-            copyText.textContent = "Copied Link!";
-            setTimeout(() => {
-              copyText.textContent = "Copy Link";
-            }, 2000);
+        const origin = getCurrentOrigin(false);
+        const shareUrl = lastGeneratedJobId
+          ? origin + "/?job_id=" + encodeURIComponent(lastGeneratedJobId)
+          : origin + "/output/" + encodeURIComponent(lastGeneratedFilename);
+
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard
+            .writeText(shareUrl)
+            .then(markCopiedUi)
+            .catch(() => {
+              if (copyTextFallback(shareUrl)) {
+                markCopiedUi();
+              } else {
+                prompt("ចម្លង Link ដោយដៃ៖", shareUrl);
+              }
+            });
+        } else {
+          if (copyTextFallback(shareUrl)) {
+            markCopiedUi();
+          } else {
+            prompt("ចម្លង Link ដោយដៃ៖", shareUrl);
           }
-        });
+        }
       }
 
       const ipaInput = document.getElementById("ipa-file-input");
@@ -731,7 +929,7 @@
         p12Input.addEventListener("change", (e) => {
           if (e.target.files.length > 0) {
             p12Name.textContent = e.target.files[0].name;
-            p12Name.classList.add("text-cyan-400", "font-bold");
+            p12Name.classList.add("font-bold");
           }
         });
       }
@@ -742,7 +940,29 @@
         provInput.addEventListener("change", (e) => {
           if (e.target.files.length > 0) {
             provName.textContent = e.target.files[0].name;
-            provName.classList.add("text-teal-400", "font-bold");
+            provName.classList.add("font-bold");
+          }
+        });
+      }
+
+      const iconInput = document.getElementById("icon-file-input");
+      const iconName = document.getElementById("icon-name");
+      if (iconInput) {
+        iconInput.addEventListener("change", (e) => {
+          if (e.target.files.length > 0) {
+            iconName.textContent = e.target.files[0].name;
+            iconName.classList.add("font-bold");
+          }
+        });
+      }
+
+      const tweakInput = document.getElementById("tweak-file-input");
+      const tweakName = document.getElementById("tweak-name");
+      if (tweakInput) {
+        tweakInput.addEventListener("change", (e) => {
+          if (e.target.files.length > 0) {
+            tweakName.textContent = e.target.files[0].name;
+            tweakName.classList.add("font-bold");
           }
         });
       }
@@ -763,16 +983,10 @@
           const sharedView = document.getElementById("shared-install-view");
           if (sharedView) sharedView.classList.remove("hidden");
 
-          let origin = window.location.origin;
-          if (
-            origin.startsWith("http://") &&
-            !origin.includes("localhost") &&
-            !origin.includes("127.0.0.1")
-          ) {
-            origin = origin.replace("http://", "https://");
-          }
+          const origin = getCurrentOrigin(false);
+          const manifestOrigin = getCurrentOrigin(true);
           const manifestUrl =
-            origin +
+            manifestOrigin +
             "/manifest.plist?job_id=" +
             encodeURIComponent(sharedJobId);
           document.getElementById("shared-install-btn").href =
@@ -825,6 +1039,7 @@
           statusLabel.textContent = "ស្ថានភាព៖ កំពុង Sign...";
           successBox.classList.add("hidden");
           progressBarFill.style.width = "0%";
+          progressPercent.textContent = "0.00%";
 
           fetch("/sign", { method: "POST", body: formData })
             .then((res) => res.json())
@@ -835,48 +1050,65 @@
                 return;
               }
 
+              const activeJobId = data.job_id || "";
+              const progressUrl = activeJobId
+                ? "/progress?job_id=" + encodeURIComponent(activeJobId)
+                : "/progress";
+
               let poll = setInterval(() => {
-                fetch("/progress")
+                fetch(progressUrl)
                   .then((r) => r.json())
                   .then((prog) => {
-                    progressBarFill.style.width = prog.percent + "%";
-                    progressPercent.textContent = prog.percent.toFixed(2) + "%";
-                    statusLabel.textContent = "ស្ថានភាព៖ " + prog.message;
+                    const pct = Number(prog.percent || 0);
+                    progressBarFill.style.width = pct + "%";
+                    progressPercent.textContent = pct.toFixed(2) + "%";
+                    statusLabel.textContent =
+                      "ស្ថានភាព៖ " + (prog.message || "");
 
                     if (prog.status === "error") {
                       clearInterval(poll);
                       statusLabel.textContent = "ស្ថានភាព៖ បរាជ័យ";
                       alert(prog.message);
-                    } else if (prog.status === "done" || prog.percent >= 100) {
+                    } else if (prog.status === "done" || pct >= 100) {
                       clearInterval(poll);
                       statusLabel.textContent = "ស្ថានភាព៖ រួចរាល់";
                       successBox.classList.remove("hidden");
-                      lastGeneratedJobId = prog.job_id || "";
 
-                      let origin = window.location.origin;
-                      if (
-                        origin.startsWith("http://") &&
-                        !origin.includes("localhost") &&
-                        !origin.includes("127.0.0.1")
-                      ) {
-                        origin = origin.replace("http://", "https://");
+                      const doneJobId = prog.job_id || activeJobId;
+                      lastGeneratedJobId = doneJobId;
+                      lastGeneratedFilename = prog.filename || "";
+
+                      const origin = getCurrentOrigin(false);
+                      const manifestOrigin = getCurrentOrigin(true);
+
+                      const downloadUrl =
+                        origin +
+                        "/output/" +
+                        encodeURIComponent(prog.filename || "");
+                      const dlBtn = document.getElementById(
+                        "download-signed-ipa",
+                      );
+                      dlBtn.href = downloadUrl;
+                      if (prog.filename) {
+                        dlBtn.setAttribute("download", prog.filename);
                       }
 
-                      const downloadUrl = origin + "/output/" + prog.filename;
-                      document.getElementById("download-signed-ipa").href =
-                        downloadUrl;
-
                       const manifestUrl =
-                        origin +
+                        manifestOrigin +
                         "/manifest.plist?job_id=" +
-                        encodeURIComponent(prog.job_id || "") +
+                        encodeURIComponent(doneJobId) +
                         "&url=" +
-                        encodeURIComponent(downloadUrl);
+                        encodeURIComponent(
+                          manifestOrigin +
+                            "/output/" +
+                            encodeURIComponent(prog.filename || ""),
+                        );
                       document.getElementById("install-app-btn").href =
                         "itms-services://?action=download-manifest&url=" +
                         encodeURIComponent(manifestUrl);
                     }
-                  });
+                  })
+                  .catch((err) => console.error("Progress poll error:", err));
               }, 800);
             })
             .catch((err) => alert("Network error: " + err));
