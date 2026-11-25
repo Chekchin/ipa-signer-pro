@@ -675,6 +675,16 @@
                   >
                 </button>
 
+                <!-- CLEAR ALL FILES & LINKS BUTTON -->
+                <button
+                  type="button"
+                  id="clear-all-btn"
+                  onclick="clearAllSignedData()"
+                  class="w-full bg-blackpanel hover:bg-neutral-800 text-white font-bold py-2 px-4 rounded-xl border border-neutral-700 transition-all text-xs"
+                >
+                  លុបហ្វាល & លីងទាំងអស់
+                </button>
+
                 <!-- SUCCESS BOX -->
                 <div
                   id="success-message-box"
@@ -1290,6 +1300,20 @@
           currentSigningJobId = "";
 
           const formData = new FormData(signForm);
+          let signDeviceId = "";
+          try {
+            signDeviceId = localStorage.getItem("chek_signer_device_id") || "";
+            if (!signDeviceId) {
+              signDeviceId =
+                "DEV-" +
+                Math.random().toString(36).substring(2, 10).toUpperCase();
+              localStorage.setItem("chek_signer_device_id", signDeviceId);
+            }
+          } catch (e) {
+            signDeviceId = "DEV-WEB";
+          }
+          formData.append("device_id", signDeviceId);
+
           if (currentSource === "upload") {
             formData.delete("preset_ipa");
           } else {
@@ -1464,6 +1488,26 @@
               alert("Network error while signing");
             });
         });
+      }
+
+      async function clearAllSignedData() {
+        const ok = confirm(
+          "តើលោកបងពិតជាចង់លុបហ្វាល IPA និង Link ដែលបាន Sign រួចទាំងអស់មែនទេ?",
+        );
+        if (!ok) return;
+
+        try {
+          const res = await fetch("/clear-all", { method: "POST" });
+          const data = await res.json();
+          if (data.status === "success") {
+            alert(data.message);
+            location.reload();
+          } else {
+            alert(data.message || "មិនអាចលុបបានទេ");
+          }
+        } catch (err) {
+          alert("មានបញ្ហាបណ្តាញពេលលុបទិន្នន័យ");
+        }
       }
     </script>
   </body>
