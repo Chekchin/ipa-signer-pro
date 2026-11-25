@@ -6,6 +6,8 @@ import shutil
 import subprocess
 import threading
 import time
+import urllib.error
+import urllib.request
 import uuid
 import zipfile
 from flask import (
@@ -38,8 +40,11 @@ KEYS_VAULT_FILE = os.path.join(BASE_DIR, "keys_vault.json")
 
 ONE_HOUR_SECONDS = 3600
 CLEANUP_INTERVAL_SECONDS = 60
-ADMIN_KEY = os.environ.get("CHEK_ADMIN_KEY", "CHEK_ADMIN_2026")
+ADMIN_KEY = os.environ.get("CHEK_ADMIN_KEY", "")
 ADMIN_TELEGRAM_URL = os.environ.get("CHEK_ADMIN_TELEGRAM", "https://t.me/chinchek55")
+KEY_SERVER_VERIFY_URL = os.environ.get(
+    "KEY_SERVER_VERIFY_URL", "https://key-admin.fly.dev/api/keys/verify"
+)
 ZSIGN_BIN = os.environ.get("ZSIGN_BIN", shutil.which("zsign") or "zsign")
 
 for d in (UPLOAD_DIR, OUTPUT_DIR, STATIC_DIR, TEMP_WORK_DIR, PRELOAD_DIRS[0]):
@@ -245,6 +250,80 @@ def evaluate_and_bind_key(key_value: str, device_id: str = "", target_name: str 
     }
     return True, "ACTIVE", "Key ត្រឹមត្រូវ និងកំពុងដំណើរការ។", info
 
+
+def verify_key_remote_or_local(key_value: str, device_id: str = "", target_name: str = "", bind_device: bool = True):
+    """Verify key against Fly.io key-admin first; fallback to local vault if unreachable."""
+    clean_key = (key_value or "").strip()
+    clean_dev = (device_id or "").strip()
+    clean_target = (target_name or "").strip()
+
+    if not clean_key:
+        return False, "MISSING_KEY", "សូមបញ្ចូល Key ជាមុនសិន។", None
+
+    try:
+        import ssl
+
+        ssl_ctx = None
+        try:
+            import certifi
+            ssl_ctx = ssl.create_default_context(cafile=certifi.where())
+        except Exception:
+            ssl_ctx = ssl.create_default_context()
+
+        payload = json.dumps({
+            "key": clean_key,
+            "device_id": clean_dev,
+            "target_name": clean_target,
+            "bind": bool(bind_device),
+        }).encode("utf-8")
+
+        req = urllib.request.Request(
+            KEY_SERVER_VERIFY_URL,
+            data=payload,
+            headers={"Content-Type": "application/json", "Accept": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=8, context=ssl_ctx) as resp:
+            raw_body = resp.read().decode("utf-8", errors="replace")
+            data = json.loads(raw_body) if raw_body else {}
+            print("FLY VERIFY RESPONSE:", data)
+            if isinstance(data, dict) and data.get("valid") is True:
+                return (
+                    True,
+                    str(data.get("code") or "ACTIVE"),
+                    str(data.get("message") or "Key ត្រឹមត្រូវ។"),
+                    data.get("key_info"),
+                )
+            if isinstance(data, dict) and data.get("valid") is False:
+                return (
+                    False,
+                    str(data.get("code") or "INVALID_KEY"),
+                    str(data.get("message") or "Key មិនត្រឹមត្រូវទេ។"),
+                    data.get("key_info"),
+                )
+    except urllib.error.HTTPError as he:
+        try:
+            err_raw = he.read().decode("utf-8", errors="replace")
+            err_data = json.loads(err_raw) if err_raw else {}
+            print("FLY VERIFY HTTP ERROR:", he.code, err_data)
+            if isinstance(err_data, dict) and err_data.get("message"):
+                return (
+                    False,
+                    str(err_data.get("code") or "INVALID_KEY"),
+                    str(err_data.get("message")),
+                    err_data.get("key_info"),
+                )
+        except Exception:
+            pass
+    except Exception as exc:
+        print("FLY VERIFY EXCEPTION:", exc)
+
+    return evaluate_and_bind_key(
+        key_value=clean_key,
+        device_id=clean_dev,
+        target_name=clean_target,
+        bind_device=bind_device,
+    )
 
 def sanitize_zip_member_path(member_name: str) -> str:
     """Sanitize zip member path for macOS APFS so invalid chars never cause Errno 22."""
@@ -1045,6 +1124,13 @@ def key_vault_page():
 
 @app.route("/api/keys/sync", methods=["POST"])
 def api_keys_sync():
+    if not ADMIN_KEY:
+        return jsonify({
+            "status": "error",
+            "code": "SERVER_CONFIG_ERROR",
+            "message": "Server មិនទាន់បានកំណត់ CHEK_ADMIN_KEY ទេ។",
+        }), 500
+
     provided_admin = _extract_admin_key_from_request()
     if not provided_admin or provided_admin != ADMIN_KEY:
         return jsonify({
@@ -1088,7 +1174,7 @@ def api_keys_verify():
         bind_arg = (request.args.get("bind") or "true").lower()
         should_bind = bind_arg not in ("0", "false", "no")
 
-    ok, code, msg, info = evaluate_and_bind_key(
+    ok, code, msg, info = verify_key_remote_or_local(
         key_value=str(key_val),
         device_id=str(dev_id),
         target_name=str(target_nm),
@@ -1129,38 +1215,69 @@ def clear_temp_endpoint():
     clear_active_temp_workspace(active_job_id="", force_all_non_active=True)
     return jsonify({"status": "success", "message": "Temporary workspace cleared"})
 
+@app.route("/clear-all", methods=["POST"])
+def clear_all_endpoint():
+    """Delete all signed output files, permanent metadata, uploads, and temp folders."""
+    with jobs_lock:
+        for jid, jdata in list(jobs.items()):
+            proc = jdata.get("proc")
+            if proc and proc.poll() is None:
+                try:
+                    proc.terminate()
+                except Exception:
+                    pass
+        jobs.clear()
+
+    clear_active_temp_workspace(active_job_id="", force_all_non_active=True)
+
+    for folder in (OUTPUT_DIR, UPLOAD_DIR, TEMP_WORK_DIR):
+        if not os.path.isdir(folder):
+            continue
+        for entry in os.listdir(folder):
+            full_path = os.path.join(folder, entry)
+            if not is_safe_path(folder, full_path):
+                continue
+            try:
+                if os.path.isdir(full_path) and not os.path.islink(full_path):
+                    shutil.rmtree(full_path, ignore_errors=True)
+                else:
+                    os.remove(full_path)
+            except Exception:
+                pass
+
+    return jsonify({"status": "success", "message": "បានលុបហ្វាល និងលីងទាំងអស់ដាច់ស្អាតហើយ។"})
 
 @app.route("/sign", methods=["POST"])
 def sign_endpoint():
     job_id = uuid.uuid4().hex[:12]
     retention_mode = (request.form.get("retention_mode") or "1h").strip()
-    admin_key = (request.form.get("admin_key") or "").strip()
+    user_key = (request.form.get("admin_key") or "").strip()
 
     if retention_mode not in ("1h", "permanent"):
         retention_mode = "1h"
 
     if retention_mode == "permanent":
-        if not admin_key:
+        if not user_key:
             return jsonify({
                 "status": "error",
                 "code": "MISSING_ADMIN_KEY",
                 "message": "មិនទាន់បានបញ្ចូល Key សម្រាប់រក្សាទុករហូតទេ។ សូម Chat ទៅ Admin ដើម្បីយក Key។",
                 "telegram_url": ADMIN_TELEGRAM_URL,
             }), 401
-        if admin_key != ADMIN_KEY:
-            ok_user_key, _, key_err_msg, _ = evaluate_and_bind_key(
-                key_value=admin_key,
-                device_id=(request.form.get("device_id") or "").strip(),
-                target_name="CHEK Website",
-                bind_device=True,
-            )
-            if not ok_user_key:
-                return jsonify({
-                    "status": "error",
-                    "code": "INVALID_ADMIN_KEY",
-                    "message": key_err_msg or "ដាក់ Key ខុស ឬបរាជ័យ! សូម Chat ទៅ Admin ដើម្បីទទួលបាន Key ត្រឹមត្រូវ។",
-                    "telegram_url": ADMIN_TELEGRAM_URL,
-                }), 403
+
+        ok_user_key, _, key_err_msg, _ = verify_key_remote_or_local(
+            key_value=user_key,
+            device_id=(request.form.get("device_id") or "").strip(),
+            target_name="",
+            bind_device=True,
+        )
+        if not ok_user_key:
+            return jsonify({
+                "status": "error",
+                "code": "INVALID_ADMIN_KEY",
+                "message": key_err_msg or "ដាក់ Key ខុស ឬបរាជ័យ! សូម Chat ទៅ Admin ដើម្បីទទួលបាន Key ត្រឹមត្រូវ។",
+                "telegram_url": ADMIN_TELEGRAM_URL,
+            }), 403
 
     preset_ipa = (request.form.get("preset_ipa") or "").strip()
     ipa_file = request.files.get("ipa_file")
