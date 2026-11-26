@@ -1,3 +1,4 @@
+import html
 import json
 import os
 import plistlib
@@ -12,6 +13,7 @@ import uuid
 import zipfile
 from flask import (
     Flask,
+    Response,
     jsonify,
     render_template,
     request,
@@ -694,6 +696,40 @@ def extract_ipa_metadata(ipa_path: str, job_work_dir: str, job_id: str):
         shutil.rmtree(extract_dir, ignore_errors=True)
 
     return app_name, icon_rel_url
+
+
+def _extract_ipa_install_meta(ipa_file_path: str, fallback_title: str, fallback_id: str):
+    bundle_id = f"com.chek.signed.{fallback_id}"
+    bundle_version = "1.0"
+    app_title = fallback_title or "Signed App"
+
+    if ipa_file_path and os.path.isfile(ipa_file_path):
+        try:
+            with zipfile.ZipFile(ipa_file_path, "r") as zf:
+                for member in zf.namelist():
+                    if "__MACOSX/" in member:
+                        continue
+                    if re.match(r"^Payload/[^/]+\.app/Info\.plist$", member):
+                        raw_plist = zf.read(member)
+                        try:
+                            pl = plistlib.loads(raw_plist)
+                            if isinstance(pl, dict):
+                                bid = pl.get("CFBundleIdentifier")
+                                bver = pl.get("CFBundleShortVersionString") or pl.get("CFBundleVersion")
+                                bname = pl.get("CFBundleDisplayName") or pl.get("CFBundleName")
+                                if isinstance(bid, str) and bid.strip():
+                                    bundle_id = bid.strip()
+                                if bver is not None and str(bver).strip():
+                                    bundle_version = str(bver).strip()
+                                if isinstance(bname, str) and bname.strip() and not fallback_title:
+                                    app_title = bname.strip()
+                        except Exception:
+                            pass
+                        break
+        except Exception:
+            pass
+
+    return bundle_id, bundle_version, app_title
 
 
 def find_payload_dir(*search_roots):
@@ -1532,6 +1568,67 @@ def job_info_endpoint():
         "filename": j.get("filename") or "",
         "retention_mode": j.get("retention_mode") or "1h",
     })
+
+
+@app.route("/manifest.plist")
+def manifest_plist():
+    job_id = safe_name(request.args.get("job_id") or "")
+    j = get_job(job_id)
+    if not j or not j.get("filename"):
+        abort(404)
+
+    clean_ipa_name = safe_name(j["filename"])
+    ipa_full_path = os.path.join(OUTPUT_DIR, clean_ipa_name)
+    if not is_safe_path(OUTPUT_DIR, ipa_full_path) or not os.path.isfile(ipa_full_path):
+        abort(404)
+
+    base_title = j.get("title") or j.get("app_name") or "App"
+    bundle_id, bundle_version, app_title = _extract_ipa_install_meta(
+        ipa_full_path, base_title, job_id
+    )
+
+    host_url = request.host_url.rstrip("/")
+    if host_url.startswith("http://") and "127.0.0.1" not in host_url and "localhost" not in host_url:
+        host_url = "https://" + host_url[len("http://"):]
+
+    ipa_url = html.escape(f"{host_url}/output/{clean_ipa_name}", quote=True)
+    safe_bundle_id = html.escape(bundle_id, quote=True)
+    safe_version = html.escape(bundle_version, quote=True)
+    safe_title = html.escape(app_title, quote=True)
+
+    plist_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>items</key>
+  <array>
+    <dict>
+      <key>assets</key>
+      <array>
+        <dict>
+          <key>kind</key>
+          <string>software-package</string>
+          <key>url</key>
+          <string>{ipa_url}</string>
+        </dict>
+      </array>
+      <key>metadata</key>
+      <dict>
+        <key>bundle-identifier</key>
+        <string>{safe_bundle_id}</string>
+        <key>bundle-version</key>
+        <string>{safe_version}</string>
+        <key>kind</key>
+        <string>software</string>
+        <key>title</key>
+        <string>{safe_title}</string>
+      </dict>
+    </dict>
+  </array>
+</dict>
+</plist>"""
+
+    return Response(plist_xml, mimetype="application/xml; charset=utf-8")
 
 
 @app.route("/output/<path:filename>")
