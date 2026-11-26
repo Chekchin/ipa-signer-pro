@@ -49,6 +49,14 @@
       };
     </script>
     <style>
+      button,
+      label,
+      input,
+      select,
+      a {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
       .white-highlight {
         color: #ffffff;
         background: rgba(255, 255, 255, 0.14);
@@ -515,32 +523,63 @@
                   </div>
                 </div>
 
+                <!-- INTERACTIVE TOGGLE SWITCHES FOR IOS / IPAD -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                  <label
-                    class="flex items-center gap-2 text-xs font-medium text-neutral-200 cursor-pointer"
+                  <button
+                    type="button"
+                    id="toggle-file-sharing-btn"
+                    onclick="toggleOptionSwitch('enable-file-sharing-checkbox', 'toggle-file-sharing-track', 'toggle-file-sharing-thumb')"
+                    class="w-full flex items-center justify-between gap-2 bg-blackcard hover:bg-neutral-900 border border-neutral-800 px-3 py-2.5 rounded-xl text-left transition-all"
                   >
-                    <input
-                      type="checkbox"
-                      name="enable_file_sharing"
-                      class="w-4 h-4 accent-white rounded"
-                    />
-                    <span data-translate="optFileSharing"
+                    <span
+                      class="text-xs font-medium text-neutral-200"
+                      data-translate="optFileSharing"
                       >បើក File Sharing (មើលក្នុង Files App)</span
                     >
-                  </label>
-
-                  <label
-                    class="flex items-center gap-2 text-xs font-medium text-neutral-200 cursor-pointer"
-                  >
                     <input
                       type="checkbox"
-                      name="remove_device_limit"
-                      class="w-4 h-4 accent-white rounded"
+                      id="enable-file-sharing-checkbox"
+                      name="enable_file_sharing"
+                      class="hidden"
                     />
-                    <span data-translate="optDeviceLimit"
+                    <span
+                      id="toggle-file-sharing-track"
+                      class="w-10 h-5 rounded-full bg-neutral-700 p-0.5 flex items-center transition-colors shrink-0"
+                    >
+                      <span
+                        id="toggle-file-sharing-thumb"
+                        class="w-4 h-4 rounded-full bg-neutral-300 transform translate-x-0 transition-transform"
+                      ></span>
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    id="toggle-device-limit-btn"
+                    onclick="toggleOptionSwitch('remove-device-limit-checkbox', 'toggle-device-limit-track', 'toggle-device-limit-thumb')"
+                    class="w-full flex items-center justify-between gap-2 bg-blackcard hover:bg-neutral-900 border border-neutral-800 px-3 py-2.5 rounded-xl text-left transition-all"
+                  >
+                    <span
+                      class="text-xs font-medium text-neutral-200"
+                      data-translate="optDeviceLimit"
                       >លុបកម្រិតឧបករណ៍ (ដំឡើងបានទាំង iPad)</span
                     >
-                  </label>
+                    <input
+                      type="checkbox"
+                      id="remove-device-limit-checkbox"
+                      name="remove_device_limit"
+                      class="hidden"
+                    />
+                    <span
+                      id="toggle-device-limit-track"
+                      class="w-10 h-5 rounded-full bg-neutral-700 p-0.5 flex items-center transition-colors shrink-0"
+                    >
+                      <span
+                        id="toggle-device-limit-thumb"
+                        class="w-4 h-4 rounded-full bg-neutral-300 transform translate-x-0 transition-transform"
+                      ></span>
+                    </span>
+                  </button>
                 </div>
 
                 <!-- ADMIN RETENTION SELECTOR (1 HOUR vs UNLIMITED) -->
@@ -853,6 +892,26 @@
           copyBtn: "Copy Link",
         },
       };
+
+      function toggleOptionSwitch(checkboxId, trackId, thumbId) {
+        const cb = document.getElementById(checkboxId);
+        const track = document.getElementById(trackId);
+        const thumb = document.getElementById(thumbId);
+        if (!cb || !track || !thumb) return;
+
+        cb.checked = !cb.checked;
+        if (cb.checked) {
+          track.classList.remove("bg-neutral-700");
+          track.classList.add("bg-white");
+          thumb.classList.remove("bg-neutral-300", "translate-x-0");
+          thumb.classList.add("bg-black", "translate-x-5");
+        } else {
+          track.classList.remove("bg-white");
+          track.classList.add("bg-neutral-700");
+          thumb.classList.remove("bg-black", "translate-x-5");
+          thumb.classList.add("bg-neutral-300", "translate-x-0");
+        }
+      }
 
       function hideAdminKeyBoxAlert() {
         const box = document.getElementById("admin-key-alert-box");
