@@ -45,7 +45,7 @@ CLEANUP_INTERVAL_SECONDS = 60
 ADMIN_KEY = os.environ.get("CHEK_ADMIN_KEY", "")
 ADMIN_TELEGRAM_URL = os.environ.get("CHEK_ADMIN_TELEGRAM", "https://t.me/chinchek55")
 KEY_SERVER_VERIFY_URL = os.environ.get(
-    "KEY_SERVER_VERIFY_URL", "https://key-admin.fly.dev/api/keys/verify"
+    "KEY_SERVER_VERIFY_URL", "https://get-key-all-chek.fly.dev/api/keys/verify"
 )
 ZSIGN_BIN = os.environ.get("ZSIGN_BIN", shutil.which("zsign") or "zsign")
 
