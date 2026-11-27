@@ -47,6 +47,7 @@ ADMIN_TELEGRAM_URL = os.environ.get("CHEK_ADMIN_TELEGRAM", "https://t.me/chinche
 KEY_SERVER_VERIFY_URL = os.environ.get(
     "KEY_SERVER_VERIFY_URL", "https://get-key-all-chek.fly.dev/api/keys/verify"
 )
+WEB_SIGN_TARGET_NAME = os.environ.get("WEB_SIGN_TARGET_NAME", "web").strip() or "web"
 ZSIGN_BIN = os.environ.get("ZSIGN_BIN", shutil.which("zsign") or "zsign")
 
 for d in (UPLOAD_DIR, OUTPUT_DIR, STATIC_DIR, TEMP_WORK_DIR, PRELOAD_DIRS[0]):
@@ -199,7 +200,27 @@ def _extract_admin_key_from_request() -> str:
     return (request.form.get("admin_key") or request.args.get("admin_key") or "").strip()
 
 
-def evaluate_and_bind_key(key_value: str, device_id: str = "", target_name: str = "", bind_device: bool = True):
+def _is_web_only_key(key_value: str, key_info: dict = None, expected_target: str = WEB_SIGN_TARGET_NAME) -> bool:
+    """Allow ONLY web keys; reject game/tool/other keys."""
+    clean_k = (key_value or "").strip().lower()
+    expected_t = (expected_target or "web").strip().lower()
+    if isinstance(key_info, dict):
+        k_kind = str(key_info.get("kind") or "").strip().lower()
+        k_target = str(key_info.get("targetName") or key_info.get("target_name") or "").strip().lower()
+        if k_kind:
+            return k_kind == "web" and (not k_target or k_target == expected_t or k_target.startswith("web"))
+        if k_target:
+            return k_target == expected_t or k_target.startswith("web")
+    return clean_k.startswith("web")
+
+
+def evaluate_and_bind_key(
+    key_value: str,
+    device_id: str = "",
+    target_name: str = "",
+    bind_device: bool = True,
+    require_web_only: bool = False,
+):
     """Validate key status (paused, expired, target, device limit) and optionally bind device_id."""
     clean_key = (key_value or "").strip()
     clean_dev = (device_id or "").strip()
@@ -220,8 +241,16 @@ def evaluate_and_bind_key(key_value: str, device_id: str = "", target_name: str 
         return False, "INVALID_KEY", "Key មិនត្រឹមត្រូវ ឬមិនមានក្នុងប្រព័ន្ធទេ។", None
 
     rec = dict(vault[matched_idx])
+    if require_web_only and not _is_web_only_key(clean_key, rec, clean_target or WEB_SIGN_TARGET_NAME):
+        return (
+            False,
+            "WRONG_TARGET",
+            "Key នេះមិនមែនសម្រាប់ Website Sign IPA ទេ (មិនអាចប្រើ Key Game ឬ Tool បានឡើយ)។",
+            rec,
+        )
+
     rec_target = str(rec.get("targetName") or "").strip().lower()
-    if clean_target and rec_target and clean_target != rec_target:
+    if clean_target and rec_target and clean_target != rec_target and not (require_web_only and rec_target.startswith("web")):
         return (
             False,
             "WRONG_TARGET",
@@ -285,8 +314,14 @@ def evaluate_and_bind_key(key_value: str, device_id: str = "", target_name: str 
     return True, "ACTIVE", "Key ត្រឹមត្រូវ និងកំពុងដំណើរការ។", info
 
 
-def verify_key_remote_or_local(key_value: str, device_id: str = "", target_name: str = "", bind_device: bool = True):
-    """Verify key against Fly.io key-admin first; fallback to local vault if unreachable."""
+def verify_key_remote_or_local(
+    key_value: str,
+    device_id: str = "",
+    target_name: str = "",
+    bind_device: bool = True,
+    require_web_only: bool = False,
+):
+    """Verify key against Fly.io server first; enforce web-only key if require_web_only=True."""
     clean_key = (key_value or "").strip()
     clean_dev = (device_id or "").strip()
     clean_target = (target_name or "").strip()
@@ -322,11 +357,19 @@ def verify_key_remote_or_local(key_value: str, device_id: str = "", target_name:
             data = json.loads(raw_body) if raw_body else {}
             print("FLY VERIFY RESPONSE:", data)
             if isinstance(data, dict) and data.get("valid") is True:
+                k_info = data.get("key_info")
+                if require_web_only and not _is_web_only_key(clean_key, k_info, clean_target or WEB_SIGN_TARGET_NAME):
+                    return (
+                        False,
+                        "WRONG_TARGET",
+                        "Key នេះមិនមែនសម្រាប់ Website Sign IPA ទេ (មិនអាចប្រើ Key Game ឬ Tool បានឡើយ)។",
+                        k_info,
+                    )
                 return (
                     True,
                     str(data.get("code") or "ACTIVE"),
                     str(data.get("message") or "Key ត្រឹមត្រូវ។"),
-                    data.get("key_info"),
+                    k_info,
                 )
             if isinstance(data, dict) and data.get("valid") is False:
                 return (
@@ -357,6 +400,7 @@ def verify_key_remote_or_local(key_value: str, device_id: str = "", target_name:
         device_id=clean_dev,
         target_name=clean_target,
         bind_device=bind_device,
+        require_web_only=require_web_only,
     )
 
 
@@ -1292,6 +1336,7 @@ def api_keys_verify():
         device_id=str(dev_id),
         target_name=str(target_nm),
         bind_device=bool(should_bind),
+        require_web_only=False,
     )
     if not ok:
         status_code = 423 if code == "PAUSED_KEY" else 403
@@ -1383,8 +1428,9 @@ def sign_endpoint():
         ok_user_key, _, key_err_msg, _ = verify_key_remote_or_local(
             key_value=user_key,
             device_id=(request.form.get("device_id") or "").strip(),
-            target_name="",
+            target_name=WEB_SIGN_TARGET_NAME,
             bind_device=True,
+            require_web_only=True,
         )
         if not ok_user_key:
             return jsonify({
