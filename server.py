@@ -46,8 +46,10 @@ ADMIN_KEY = os.environ.get("CHEK_ADMIN_KEY", "")
 ADMIN_TELEGRAM_URL = os.environ.get("CHEK_ADMIN_TELEGRAM", "https://t.me/chinchek55")
 KEY_SERVER_VERIFY_URL = os.environ.get(
     "KEY_SERVER_VERIFY_URL", "https://get-key-all-chek.fly.dev/api/keys/verify"
+).strip()
+WEB_SIGN_TARGET_NAME = (
+    os.environ.get("WEB_SIGN_TARGET_NAME", "CHEK Website").strip() or "CHEK Website"
 )
-WEB_SIGN_TARGET_NAME = os.environ.get("WEB_SIGN_TARGET_NAME", "web").strip() or "web"
 ZSIGN_BIN = os.environ.get("ZSIGN_BIN", shutil.which("zsign") or "zsign")
 
 for d in (UPLOAD_DIR, OUTPUT_DIR, STATIC_DIR, TEMP_WORK_DIR, PRELOAD_DIRS[0]):
@@ -200,17 +202,36 @@ def _extract_admin_key_from_request() -> str:
     return (request.form.get("admin_key") or request.args.get("admin_key") or "").strip()
 
 
+def _fallback_web_device_id(device_id: str = "") -> str:
+    clean = (device_id or "").strip()
+    if clean:
+        return clean[:128]
+    try:
+        ip = (
+            request.headers.get("Fly-Client-IP")
+            or request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+            or request.remote_addr
+            or "web-client"
+        )
+        ua = (request.headers.get("User-Agent") or "browser")[:48]
+        return f"web-{ip}-{ua}"[:128]
+    except Exception:
+        return "web-default-device"
+
+
 def _is_web_only_key(key_value: str, key_info: dict = None, expected_target: str = WEB_SIGN_TARGET_NAME) -> bool:
-    """Allow ONLY web keys; reject game/tool/other keys."""
+    """Allow ONLY website keys; reject game/tool/other keys."""
     clean_k = (key_value or "").strip().lower()
-    expected_t = (expected_target or "web").strip().lower()
+    expected_t = (expected_target or "CHEK Website").strip().lower()
     if isinstance(key_info, dict):
         k_kind = str(key_info.get("kind") or "").strip().lower()
         k_target = str(key_info.get("targetName") or key_info.get("target_name") or "").strip().lower()
         if k_kind:
-            return k_kind == "web" and (not k_target or k_target == expected_t or k_target.startswith("web"))
+            return k_kind in ("website", "web") and (
+                not k_target or k_target == expected_t or "web" in k_target
+            )
         if k_target:
-            return k_target == expected_t or k_target.startswith("web")
+            return k_target == expected_t or "web" in k_target
     return clean_k.startswith("web")
 
 
@@ -223,7 +244,7 @@ def evaluate_and_bind_key(
 ):
     """Validate key status (paused, expired, target, device limit) and optionally bind device_id."""
     clean_key = (key_value or "").strip()
-    clean_dev = (device_id or "").strip()
+    clean_dev = _fallback_web_device_id(device_id)
     clean_target = (target_name or "").strip().lower()
 
     if not clean_key:
@@ -250,7 +271,7 @@ def evaluate_and_bind_key(
         )
 
     rec_target = str(rec.get("targetName") or "").strip().lower()
-    if clean_target and rec_target and clean_target != rec_target and not (require_web_only and rec_target.startswith("web")):
+    if clean_target and rec_target and clean_target != rec_target and not (require_web_only and "web" in rec_target):
         return (
             False,
             "WRONG_TARGET",
@@ -321,10 +342,14 @@ def verify_key_remote_or_local(
     bind_device: bool = True,
     require_web_only: bool = False,
 ):
-    """Verify key against Fly.io server first; enforce web-only key if require_web_only=True."""
+    """Verify key against Fly.io server first; enforce website-only key if require_web_only=True."""
     clean_key = (key_value or "").strip()
-    clean_dev = (device_id or "").strip()
-    clean_target = (target_name or "").strip()
+    clean_dev = _fallback_web_device_id(device_id)
+    clean_target = (target_name or WEB_SIGN_TARGET_NAME).strip()
+    clean_kind = "website" if require_web_only else (
+        "game" if clean_key.lower().startswith(("ff-", "pubg-", "pool8-", "carpark-", "carx-", "game-"))
+        else ("tool" if clean_key.lower().startswith("tool-") else "website")
+    )
 
     if not clean_key:
         return False, "MISSING_KEY", "សូមបញ្ចូល Key ជាមុនសិន។", None
@@ -343,6 +368,7 @@ def verify_key_remote_or_local(
             "key": clean_key,
             "device_id": clean_dev,
             "target_name": clean_target,
+            "kind": clean_kind,
             "bind": bool(bind_device),
         }).encode("utf-8")
 
@@ -358,7 +384,7 @@ def verify_key_remote_or_local(
             print("FLY VERIFY RESPONSE:", data)
             if isinstance(data, dict) and data.get("valid") is True:
                 k_info = data.get("key_info")
-                if require_web_only and not _is_web_only_key(clean_key, k_info, clean_target or WEB_SIGN_TARGET_NAME):
+                if require_web_only and not _is_web_only_key(clean_key, k_info, clean_target):
                     return (
                         False,
                         "WRONG_TARGET",
