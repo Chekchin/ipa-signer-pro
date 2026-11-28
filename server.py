@@ -31,6 +31,10 @@ app.config["MAX_CONTENT_LENGTH"] = MAX_IPA_SIZE_BYTES
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
+PERMANENT_DIR = (
+    os.environ.get("PERMANENT_OUTPUT_DIR")
+    or os.path.join(BASE_DIR, "permanent_output")
+).strip() or os.path.join(BASE_DIR, "permanent_output")
 PRELOAD_DIRS = [
     os.path.join(BASE_DIR, "preloaded"),
     os.path.join(BASE_DIR, "preset_ipas"),
@@ -52,7 +56,7 @@ WEB_SIGN_TARGET_NAME = (
 )
 ZSIGN_BIN = os.environ.get("ZSIGN_BIN", shutil.which("zsign") or "zsign")
 
-for d in (UPLOAD_DIR, OUTPUT_DIR, STATIC_DIR, TEMP_WORK_DIR, PRELOAD_DIRS[0]):
+for d in (UPLOAD_DIR, OUTPUT_DIR, PERMANENT_DIR, STATIC_DIR, TEMP_WORK_DIR, PRELOAD_DIRS[0]):
     os.makedirs(d, exist_ok=True)
 
 jobs_lock = threading.Lock()
@@ -494,13 +498,45 @@ def free_disk_bytes(path_to_check: str) -> int:
         return MAX_IPA_SIZE_BYTES
 
 
+# ==================== DEDICATED PERMANENT KEY STORAGE ====================
+def permanent_job_dir(job_id: str) -> str:
+    """Dedicated folder per permanent key link (stores IPA, icon, and metadata together)."""
+    clean_id = safe_name(job_id, "job")
+    os.makedirs(PERMANENT_DIR, exist_ok=True)
+    return os.path.join(PERMANENT_DIR, clean_id)
+
+
 def permanent_meta_path(job_id: str) -> str:
     clean_id = safe_name(job_id, "job")
-    return os.path.join(OUTPUT_DIR, f"meta_{clean_id}.json")
+    return os.path.join(PERMANENT_DIR, f"meta_{clean_id}.json")
+
+
+def find_stored_artifact(filename: str):
+    """Locate a signed IPA or icon in PERMANENT_DIR first, then OUTPUT_DIR."""
+    clean_file = safe_name(filename, "")
+    if not clean_file:
+        return None, None
+
+    if os.path.isdir(PERMANENT_DIR):
+        for entry in os.listdir(PERMANENT_DIR):
+            sub_dir = os.path.join(PERMANENT_DIR, entry)
+            if os.path.isdir(sub_dir) and is_safe_path(PERMANENT_DIR, sub_dir):
+                cand = os.path.join(sub_dir, clean_file)
+                if is_safe_path(sub_dir, cand) and os.path.isfile(cand):
+                    return sub_dir, cand
+        root_cand = os.path.join(PERMANENT_DIR, clean_file)
+        if is_safe_path(PERMANENT_DIR, root_cand) and os.path.isfile(root_cand):
+            return PERMANENT_DIR, root_cand
+
+    out_cand = os.path.join(OUTPUT_DIR, clean_file)
+    if is_safe_path(OUTPUT_DIR, out_cand) and os.path.isfile(out_cand):
+        return OUTPUT_DIR, out_cand
+
+    return None, None
 
 
 def save_permanent_job_if_needed(job_snapshot: dict):
-    """Persist permanent retention job metadata to disk so links survive server restarts."""
+    """Persist permanent key job artifacts & metadata in dedicated PERMANENT_DIR."""
     if not job_snapshot or job_snapshot.get("retention_mode") != "permanent":
         return
     if job_snapshot.get("status") != "done":
@@ -508,9 +544,48 @@ def save_permanent_job_if_needed(job_snapshot: dict):
     jid = safe_name(job_snapshot.get("job_id") or "")
     if not jid:
         return
-    meta_file = permanent_meta_path(jid)
-    if not is_safe_path(OUTPUT_DIR, meta_file):
+
+    p_dir = permanent_job_dir(jid)
+    if not is_safe_path(PERMANENT_DIR, p_dir):
         return
+    os.makedirs(p_dir, exist_ok=True)
+
+    raw_filename = safe_name(job_snapshot.get("filename") or "")
+    stored_filename = raw_filename
+    if raw_filename:
+        src_ipa = os.path.join(OUTPUT_DIR, raw_filename)
+        dst_ipa = os.path.join(p_dir, raw_filename)
+        if os.path.isfile(src_ipa) and is_safe_path(OUTPUT_DIR, src_ipa) and is_safe_path(p_dir, dst_ipa):
+            try:
+                shutil.move(src_ipa, dst_ipa)
+            except Exception:
+                try:
+                    shutil.copy2(src_ipa, dst_ipa)
+                except Exception:
+                    pass
+
+    icon_url = job_snapshot.get("icon_url") or "/static/cheklogo.png"
+    stored_icon_url = icon_url
+    if isinstance(icon_url, str) and icon_url.startswith("/output/"):
+        raw_icon = safe_name(icon_url[len("/output/"):])
+        if raw_icon:
+            src_icon = os.path.join(OUTPUT_DIR, raw_icon)
+            dst_icon = os.path.join(p_dir, raw_icon)
+            if os.path.isfile(src_icon) and is_safe_path(OUTPUT_DIR, src_icon) and is_safe_path(p_dir, dst_icon):
+                try:
+                    shutil.move(src_icon, dst_icon)
+                    stored_icon_url = f"/output/{raw_icon}"
+                except Exception:
+                    try:
+                        shutil.copy2(src_icon, dst_icon)
+                        stored_icon_url = f"/output/{raw_icon}"
+                    except Exception:
+                        pass
+
+    meta_file = permanent_meta_path(jid)
+    if not is_safe_path(PERMANENT_DIR, meta_file):
+        return
+
     payload = {
         "job_id": jid,
         "status": "done",
@@ -518,14 +593,16 @@ def save_permanent_job_if_needed(job_snapshot: dict):
         "message": job_snapshot.get("message") or "រួចរាល់",
         "retention_mode": "permanent",
         "created_at": job_snapshot.get("created_at") or time.time(),
-        "filename": job_snapshot.get("filename") or "",
+        "filename": stored_filename,
         "title": job_snapshot.get("title") or job_snapshot.get("app_name") or "App",
         "app_name": job_snapshot.get("app_name") or job_snapshot.get("title") or "App",
-        "icon_url": job_snapshot.get("icon_url") or "/static/cheklogo.png",
+        "icon_url": stored_icon_url,
     }
     try:
-        with open(meta_file, "w", encoding="utf-8") as mf:
+        tmp_meta = meta_file + ".tmp"
+        with open(tmp_meta, "w", encoding="utf-8") as mf:
             json.dump(payload, mf, ensure_ascii=False, indent=2)
+        os.replace(tmp_meta, meta_file)
     except Exception:
         pass
 
@@ -535,7 +612,7 @@ def load_permanent_job(job_id: str):
     if not clean_id:
         return None
     meta_file = permanent_meta_path(clean_id)
-    if not is_safe_path(OUTPUT_DIR, meta_file) or not os.path.isfile(meta_file):
+    if not is_safe_path(PERMANENT_DIR, meta_file) or not os.path.isfile(meta_file):
         return None
     try:
         with open(meta_file, "r", encoding="utf-8") as mf:
@@ -548,7 +625,7 @@ def load_permanent_job(job_id: str):
 
 
 def clear_active_temp_workspace(active_job_id: str = "", force_all_non_active: bool = False):
-    """Clear temporary work/upload files when switching tabs or starting a new sign without touching output/."""
+    """Clear temporary work/upload files without touching output/ or PERMANENT_DIR."""
     now = time.time()
 
     try:
@@ -590,7 +667,7 @@ def clear_active_temp_workspace(active_job_id: str = "", force_all_non_active: b
 
 
 def purge_stale_temp_and_expired_files(active_job_id: str = ""):
-    """Free disk space by cleaning leftover temp/uploads and expired 1h outputs (never touching permanent)."""
+    """Clean temporary files and expired 1h links while keeping permanent key links untouched."""
     clear_active_temp_workspace(active_job_id=active_job_id, force_all_non_active=False)
 
     now = time.time()
@@ -609,7 +686,7 @@ def purge_stale_temp_and_expired_files(active_job_id: str = ""):
             jobs.pop(jid, None)
 
     for snap in expired_snaps:
-        cleanup_job_artifacts(snap)
+        cleanup_job_artifacts(snap, include_permanent=False)
 
 
 def update_job(job_id: str, **kwargs):
@@ -630,7 +707,12 @@ def get_job(job_id: str):
         return None
     with jobs_lock:
         if clean_id in jobs:
-            return dict(jobs[clean_id])
+            snap = dict(jobs[clean_id])
+            if snap.get("retention_mode") == "permanent" and snap.get("status") == "done":
+                persisted = load_permanent_job(clean_id)
+                if persisted:
+                    snap.update(persisted)
+            return snap
     return load_permanent_job(clean_id)
 
 
@@ -1241,8 +1323,12 @@ def run_sign_worker(job_id: str, params: dict):
                     pass
 
 
-def cleanup_job_artifacts(job_data: dict):
+def cleanup_job_artifacts(job_data: dict, include_permanent: bool = False):
     job_id = job_data.get("job_id")
+    is_perm = job_data.get("retention_mode") == "permanent"
+    if is_perm and not include_permanent:
+        return
+
     work_dir = job_data.get("work_dir")
     if work_dir and os.path.exists(work_dir) and is_safe_path(TEMP_WORK_DIR, work_dir):
         shutil.rmtree(work_dir, ignore_errors=True)
@@ -1275,16 +1361,20 @@ def cleanup_job_artifacts(job_data: dict):
                     except Exception:
                         pass
 
-        meta_file = permanent_meta_path(job_id)
-        if os.path.exists(meta_file) and is_safe_path(OUTPUT_DIR, meta_file):
-            try:
-                os.remove(meta_file)
-            except Exception:
-                pass
+        if include_permanent:
+            p_dir = permanent_job_dir(job_id)
+            if os.path.isdir(p_dir) and is_safe_path(PERMANENT_DIR, p_dir):
+                shutil.rmtree(p_dir, ignore_errors=True)
+            meta_file = permanent_meta_path(job_id)
+            if os.path.exists(meta_file) and is_safe_path(PERMANENT_DIR, meta_file):
+                try:
+                    os.remove(meta_file)
+                except Exception:
+                    pass
 
 
 def retention_cleanup_loop():
-    """Auto-delete 1h retention jobs/files; keep permanent retention jobs untouched."""
+    """Auto-delete 1h retention jobs/files; keep permanent key links in PERMANENT_DIR untouched."""
     while True:
         time.sleep(CLEANUP_INTERVAL_SECONDS)
         purge_stale_temp_and_expired_files()
@@ -1395,14 +1485,14 @@ def preset_ipas():
 
 @app.route("/clear-temp", methods=["POST"])
 def clear_temp_endpoint():
-    """Clear temporary uploads/work folders when switching to Upload tab without deleting shared links."""
+    """Clear temporary uploads/work folders without touching output/ or PERMANENT_DIR."""
     clear_active_temp_workspace(active_job_id="", force_all_non_active=True)
     return jsonify({"status": "success", "message": "Temporary workspace cleared"})
 
 
 @app.route("/clear-all", methods=["POST"])
 def clear_all_endpoint():
-    """Delete all signed output files, permanent metadata, uploads, and temp folders."""
+    """Delete signed output files, uploads, temp folders, and permanent key folders."""
     with jobs_lock:
         for jid, jdata in list(jobs.items()):
             proc = jdata.get("proc")
@@ -1415,7 +1505,7 @@ def clear_all_endpoint():
 
     clear_active_temp_workspace(active_job_id="", force_all_non_active=True)
 
-    for folder in (OUTPUT_DIR, UPLOAD_DIR, TEMP_WORK_DIR):
+    for folder in (OUTPUT_DIR, PERMANENT_DIR, UPLOAD_DIR, TEMP_WORK_DIR):
         if not os.path.isdir(folder):
             continue
         for entry in os.listdir(folder):
@@ -1566,7 +1656,7 @@ def sign_endpoint():
         return jsonify({"status": "success", "job_id": job_id})
 
     except Exception as exc:
-        cleanup_job_artifacts(get_job(job_id) or {"job_id": job_id})
+        cleanup_job_artifacts(get_job(job_id) or {"job_id": job_id}, include_permanent=False)
         with jobs_lock:
             jobs.pop(job_id, None)
         return jsonify({"status": "error", "message": str(exc)}), 400
@@ -1619,7 +1709,7 @@ def cancel_endpoint():
         else:
             snap = {"job_id": job_id}
 
-    cleanup_job_artifacts(snap)
+    cleanup_job_artifacts(snap, include_permanent=False)
     purge_stale_temp_and_expired_files(active_job_id="")
     return jsonify({"status": "success", "message": "Cancelled"})
 
@@ -1650,8 +1740,8 @@ def manifest_plist():
         abort(404)
 
     clean_ipa_name = safe_name(j["filename"])
-    ipa_full_path = os.path.join(OUTPUT_DIR, clean_ipa_name)
-    if not is_safe_path(OUTPUT_DIR, ipa_full_path) or not os.path.isfile(ipa_full_path):
+    _, ipa_full_path = find_stored_artifact(clean_ipa_name)
+    if not ipa_full_path or not os.path.isfile(ipa_full_path):
         abort(404)
 
     base_title = j.get("title") or j.get("app_name") or "App"
@@ -1706,10 +1796,10 @@ def manifest_plist():
 @app.route("/output/<path:filename>")
 def output_file(filename):
     clean_file = safe_name(filename)
-    full_path = os.path.join(OUTPUT_DIR, clean_file)
-    if not is_safe_path(OUTPUT_DIR, full_path) or not os.path.isfile(full_path):
+    parent_dir, full_path = find_stored_artifact(clean_file)
+    if not parent_dir or not full_path or not os.path.isfile(full_path):
         abort(404)
-    return send_from_directory(OUTPUT_DIR, clean_file, as_attachment=False)
+    return send_from_directory(parent_dir, clean_file, as_attachment=False)
 
 
 if __name__ == "__main__":
